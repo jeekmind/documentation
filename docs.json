@@ -1,0 +1,120 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "almond",
+  "name": "技灵营销助手",
+  "description": "技灵是最好的 AI 助手。",
+  "colors": {
+    "primary": "#166E3F",
+    "light": "#26BD6C",
+    "dark": "#166E3F"
+  },
+  "favicon": {
+    "light": "/images/Jko-32.svg",
+    "dark": "/images/Jko-32.svg"
+  },
+  "icons": {
+    "library": "lucide"
+  },
+  "styling": {
+    "eyebrows": "breadcrumbs"
+  },
+  "contextual": {
+    "options": [
+      {
+        "title": "问问通义千问",
+        "description": "将该网页内容发送至千问进行提问",
+        "href": {
+          "base": "https://www.qianwen.com/",
+          "query": [
+            {
+              "key": "q",
+              "value": "请基于这篇文档回答问题：$page"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "navigation": {
+    "directory": "card",
+    "dropdowns": [
+      {
+        "dropdown": "Dropdown",
+        "hidden": true,
+        "languages": [
+          {
+            "language": "cn",
+            "hidden": true,
+            "products": [
+              {
+                "product": "正式版",
+                "hidden": true,
+                "anchors": [
+                  {
+                    "anchor": "技灵营销助手",
+                    "pages": [
+                      {
+                        "group": "简介",
+                        "icon": "layers",
+                        "expanded": true,
+                        "pages": [
+                          "intro/what-is-jko"
+                        ]
+                      },
+                      {
+                        "group": "功能详情",
+                        "pages": [
+                          "feature/script-agent"
+                        ]
+                      },
+                      {
+                        "group": "实用技巧",
+                        "pages": [
+                          "guide/jko-gen-face-video"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "anchor": "小知识",
+                    "pages": [
+                      "tips/good-prompt",
+                      "tips/amazon-main-image"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "logo": {
+    "light": "/images/Jko-logo-word.png",
+    "dark": "/images/Jko-logo-word-white.png"
+  },
+  "navbar": {
+    "links": [],
+    "primary": {
+      "type": "button",
+      "label": "开始使用",
+      "href": "https://ai.jko.cc"
+    }
+  },
+  "metadata": {
+    "timestamp": true
+  },
+  "api": {
+    "examples": {
+      "languages": [
+        "cURL"
+      ]
+    }
+  },
+  "fonts": {
+    "family": "Segoe UI",
+    "source": "https://cdn.jsdelivr.net/npm/segoe-fonts@1.0.1/fonts/normal/segoeui.woff",
+    "format": "woff"
+  }
+}

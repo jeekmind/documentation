@@ -1,0 +1,47 @@
+---
+description: "快速生成营销报告，先机尽握；制作创意视频，流量飙升；产品图换背景、换模特，魅力无限；视频混剪，视觉盛宴；查关税，轻松应对贸易壁垒，电商征程一路畅通！"
+mode: "frame"
+title: "主页"
+---
+
+<div data-product-guide-index className="flex w-full flex-col gap-8 max-w-5xl mx-auto px-4 md:px-8 lg:px-12 py-10 lg:gap-14 lg:py-16">
+  <div className="flex max-w-[540px] flex-col gap-2 self-center text-center">
+    <h1 className="text-[30px] font-medium leading-9 tracking-tight text-gray-900 dark:text-gray-50">
+      欢迎使用技灵营销助手
+    </h1>
+
+    <p className="text-balance text-base leading-relaxed tracking-tight text-gray-600 dark:text-gray-400">
+      快速生成营销报告，先机尽握；制作创意视频，流量飙升；产品图换背景、换模特，魅力无限；视频混剪，视觉盛宴；查关税，轻松应对贸易壁垒，电商征程一路畅通！
+    </p>
+  </div>
+
+  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <Card title={<span className="product-guide-feature-card-title">介绍</span>} icon="chart-no-axes-gantt" href="/intro/what-is-jko" className="product-guide-feature-card" size={64}>
+      <span className="product-guide-feature-card-description">什么是技灵？</span>
+    </Card>
+
+    <a href="/guide/jko-gen-face-video" className="rounded-2xl flex flex-col gap-4 border bg-gray-50 p-4 outline-none shadow-sm shadow-gray-950/5 transition hover:border-primary hover:shadow-md dark:bg-gray-950 dark:shadow-black/20 dark:hover:border-primary">
+      <Icon icon="chart-column" color="rgb(var(--primary))" size={18} className="shrink-0" />
+
+      <div className="flex flex-col gap-1">
+        <span className="font-serif text-base font-medium text-gray-900 dark:text-gray-50">指导</span>
+
+        <span className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+          通过简单的教程上手并了解技灵的功能
+        </span>
+      </div>
+    </a>
+
+    <a href="/feature/script-agent" className="rounded-2xl flex flex-col gap-4 border bg-gray-50 p-4 outline-none shadow-sm shadow-gray-950/5 transition hover:border-primary hover:shadow-md dark:bg-gray-950 dark:shadow-black/20 dark:hover:border-primary">
+      <Icon icon="code-xml" color="rgb(var(--primary))" size={18} className="shrink-0" />
+
+      <div className="flex flex-col gap-1">
+        <span className="font-serif text-base font-medium text-gray-900 dark:text-gray-50">功能参考</span>
+
+        <span className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+          通过详尽的手册熟练运用各个功能
+        </span>
+      </div>
+    </a>
+  </div>
+</div>

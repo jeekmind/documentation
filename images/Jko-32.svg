@@ -1,0 +1,11 @@
+<svg width="32" height="32" viewBox="0 0 480 480" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="logoGradient" x1="240" y1="18" x2="240" y2="460" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#00F5EE"/>
+      <stop offset="48%" stop-color="#55A4F4"/>
+      <stop offset="100%" stop-color="#981BFF"/>
+    </linearGradient>
+  </defs>
+
+  <path fill="url(#logoGradient)" fill-rule="evenodd" clip-rule="evenodd" d="M416 25&#xA;      C397 15 374 16 355 26&#xA;      C337 36 323 52 307 66&#xA;      C283 84 250 90 211 90&#xA;      C167 90 132 80 91 65&#xA;      C64 55 45 59 34 74&#xA;      C20 94 27 128 36 150&#xA;      C47 178 66 204 78 232&#xA;      C91 264 97 295 93 319&#xA;      C88 348 80 365 82 390&#xA;      C85 425 112 452 146 458&#xA;      C178 464 206 447 236 428&#xA;      C257 415 283 417 306 430&#xA;      C331 445 344 457 374 460&#xA;      C402 462 428 441 442 411&#xA;      C458 378 448 348 438 315&#xA;      C426 278 412 242 412 205&#xA;      C412 161 424 121 436 80&#xA;      C443 55 438 35 416 25&#xA;      Z&#xA;&#xA;      M207 148&#xA;      C225 148 237 172 237 202&#xA;      C237 232 225 256 207 256&#xA;      C189 256 176 232 176 202&#xA;      C176 172 189 148 207 148&#xA;      Z&#xA;&#xA;      M318 131&#xA;      C336 131 348 155 348 184&#xA;      C348 214 336 238 318 238&#xA;      C300 238 289 214 289 184&#xA;      C289 155 300 131 318 131&#xA;      Z"/>
+</svg>
