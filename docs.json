@@ -17,19 +17,10 @@
   },
   "contextual": {
     "options": [
-      {
-        "title": "问问通义千问",
-        "description": "将该网页内容发送至千问进行提问",
-        "href": {
-          "base": "https://www.qianwen.com/",
-          "query": [
-            {
-              "key": "q",
-              "value": "请基于这篇文档回答问题：$page"
-            }
-          ]
-        }
-      }
+      "chatgpt",
+      "mcp",
+      "view",
+      "copy"
     ]
   },
   "navigation": {
