@@ -1,8 +1,8 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "almond",
-  "name": "技灵营销助手",
-  "description": "技灵是最好的 AI 助手。",
+  "name": "技灵 AI 营销助手",
+  "description": "AI 营销助手",
   "colors": {
     "primary": "#166E3F",
     "light": "#26BD6C",
