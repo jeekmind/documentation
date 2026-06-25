@@ -22,7 +22,7 @@
   },
   "api": {
     "openapi": {
-      "source": "open_openapi.yaml"
+      "source": "toopen.json"
     },
     "playground": {
       "display": "interactive"
@@ -93,7 +93,7 @@
                   {
                     "group": "Plant Store API",
                     "icon": "leaf",
-                    "openapi": "open_openapi.yaml"
+                    "openapi": "toopen.json"
                   }
                 ]
               }
