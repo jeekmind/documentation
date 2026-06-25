@@ -1,0 +1,600 @@
+---
+title: "开放端接入"
+---
+## **一、概述**
+本文档为接口对接方提供标准化的“登录获取Token、Token鉴权、请求加密、签名验证及响应解密”全流程操作规范，旨在保障接口数据传输的安全性与完整性。对接方无需关注服务端内部实现，仅需按照以下约定完成前置登录、请求构造与响应解析即可正常对接。
+**核心新增说明：** 所有业务接口调用前需先通过登录接口获取有效Token，调用业务接口时需在请求头携带Token完成鉴权，加解密核心逻辑保持不变。
+## **二、核心安全约定**
+### **2.1 加密与签名算法**
+
+    
+    
+签名 / 验签 RSA 非对称加密，哈希算法为 SHA-256，签名结果采用 Base64 编码传输
+数据格式    业务数据统一使用 JSON 格式，编码需保留中文（禁用 Unicode 转义）
+
+| 类型 | 算法细节 |
+| --- | --- |
+| 对称加密 | SM4-CBC 模式（128位密钥），16字节随机IV向量，数据编码采用Base64 |
+|签名/验签|RSA 非对称加密，哈希算法为 SHA-256，签名结果采用 Base64 编码传输|
+|数据格式|业务数据统一使用 JSON 格式，编码需保留中文（禁用 Unicode 转义）|
+|Token鉴权|基于JWT/自定义令牌机制，Token有效期由我方约定（默认2小时，可配置）|
+
+### **2.2 对接必备信息（需提前向我方获取）**
+
+| 信息项 | 用途 |
+| --- | --- |
+| app-id | 对接方唯一标识，用于身份校验（由我方分配） |
+|对接方 RSA 公钥|需提供给我方，用于验证对接方请求签名（我方不存储对接方私钥）|
+|服务端 RSA 公钥|用于对接方验证我方响应签名（由我方提供）|
+|SM4 对称密钥|双方共享的加密密钥（由我方提供，需严格保密）|
+|获取token接口|用于获取Token的前置接口|
+## 三、前置操作：获取Token
+所有业务接口调用前，必须先通过获取Token接口获取有效Token，Token作为后续业务请求的鉴权凭证。登录接口为普通HTTP接口，需加密，需携带基础身份信息完成校验。
+3.1 获取token流程说明
+1. 对接方构造登录请求，携带我方分配的app-id；
+2. 调用我方登录接口，服务端校验身份信息有效性；
+
+3. 校验通过后，服务端返回有效Token（有效期24小时）；
+
+4. 对接方缓存Token，后续业务请求时在请求头携带；
+
+5. Token过期后，需重新执行登录流程获取新Token
+
+## **四、请求发送规范（对接方 → 我方）**
+对接方需按以下步骤构造请求，确保数据加密与签名有效：
+### 4.1 步骤 1：准备原始业务数据
+- 构造 JSON 格式的业务参数（例：`{"account":"admin","password":"abc123456"}`）；
+- 编码要求：使用JSON_UNESCAPED_UNICODE（中文不转义），避免多余空格或格式化
+### 4.2 步骤 2：生成请求签名（防篡改）
+1. 使用对接方自身的 RSA 私钥，对步骤 1 的原始 JSON 字符串进行 SHA-256 哈希签名；
+2. 将签名结果进行 Base64 编码，得到最终的签名串（记为sign）。
+**签名示例（伪代码python）：**
+
+```python
+import json
+import base64
+from Crypto.Signature import pkcs1_15
+from Crypto.Hash import SHA256
+from Crypto.PublicKey import RSA
+
+# 对接方私钥（自行保管，切勿泄露）
+private_key = RSA.import_key("对接方RSA私钥内容")
+# 原始业务数据
+raw_data = json.dumps({"account":"admin","password":"abc123456"}, ensure_ascii=False)
+# 生成SHA-256哈希
+hash_obj = SHA256.new(raw_data.encode("utf-8"))
+# RSA签名
+signature = pkcs1_15.new(private_key).sign(hash_obj)
+# Base64编码得到sign
+sign = base64.b64encode(signature).decode("utf-8")
+```
+**签名示例（PHP 代码）：**
+```php
+<?php
+	$privateKey = "-----BEGIN PRIVATE KEY-----\n". $yourPrivateKey."\n".'-----END PRIVATE KEY-----';
+        $privateKeyResource = openssl_pkey_get_private($privateKey);
+        if (!$privateKeyResource) {
+	        echo "私钥错误". openssl_error_string();
+	        exit;
+        }
+	$data = [
+		"account"=>"jkp0001",
+		"password"=>"abc123456"
+	];
+	$json_data = json_encode($data,JSON_UNESCAPED_UNICODE);
+	$result = openssl_sign($json_encode, $outsign, $privateKeyResource, OPENSSL_ALGO_SHA256);
+	if (!$result) {
+		echo "签名失败：" . openssl_error_string();exit;
+    }
+    $out_put = base64_encode($outsign);
+    echo $out_put;
+
+```
+**生成请求签名（Java 代码）**
+
+```java
+import java.nio.charset.StandardCharsets;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.Signature;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Base64;
+
+public class SignGenerator {
+    public static String generateSign(String rawData, String privateKeyStr) throws Exception {
+        // 1. 解码私钥（PEM格式去除头部尾部，Base64解码）
+        String privateKeyPem = privateKeyStr
+                .replace("-----BEGIN PRIVATE KEY-----", "")
+                .replace("-----END PRIVATE KEY-----", "")
+                .replaceAll("\\s+", "");
+        byte[] privateKeyBytes = Base64.getDecoder().decode(privateKeyPem);
+        
+        // 2. 加载私钥
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
+        
+        // 3. 生成RSA-SHA256签名
+        Signature signature = Signature.getInstance("SHA256withRSA");
+        signature.initSign(privateKey);
+        signature.update(rawData.getBytes(StandardCharsets.UTF_8));
+        byte[] signBytes = signature.sign();
+        
+        // 4. Base64编码签名结果
+        return Base64.getEncoder().encodeToString(signBytes);
+    }
+
+    public static void main(String[] args) throws Exception {
+        // 对接方私钥（示例私钥，实际替换为自身私钥）
+        String privateKey = "-----BEGIN PRIVATE KEY-----\n" +
+                "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDQwXq6tq4e6V3dH\n" +
+                "...（省略中间私钥内容）...\n" +
+                "f8QZ+Q==\n" +
+                "-----END PRIVATE KEY-----";
+        
+        // 原始业务数据
+        String rawData = "{\"account\":\"admin\",\"password\":"abc123456"}";
+        
+        // 生成签名
+        String sign = generateSign(rawData, privateKey);
+        System.out.println("生成的签名串：" + sign);
+        // 示例结果："aBcDeF123GhIjKlMnOpQrStUvWxYz1234567890+/="
+    }
+}
+```
+
+### 4.3 步骤 3：加密业务数据（防泄露）
+1. 生成 16 字节的随机 IV 向量（每次请求需重新生成，不可固定）；
+2. 使用 SM4-CBC 算法，以我方提供的SM4 对称密钥、生成的 IV 向量，对步骤 1 的原始 JSON 字符串进行加密（加密模式为 RAW 原始数据）；
+3. 拼接 IV 向量与加密后的密文（格式：IV + 密文）；
+4. 对拼接结果进行 Base64 编码，得到最终的请求体数据。
+
+**加密示例（伪代码 python）：**
+
+```python
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+import os
+
+# 我方提供的SM4对称密钥（16字节）
+sm4_key = "我方提供的SM4密钥".encode("utf-8")
+# 生成16字节随机IV
+iv = os.urandom(16)
+# SM4-CBC加密
+cipher = Cipher(algorithms.SM4(sm4_key), modes.CBC(iv))
+encryptor = cipher.encryptor()
+# 原始数据填充（如需，根据加密库要求处理）
+padded_data = raw_data.encode("utf-8") + b"\x00" * (16 - len(raw_data.encode("utf-8")) % 16)
+ciphertext = encryptor.update(padded_data) + encryptor.finalize()
+# 拼接IV和密文，Base64编码得到请求体
+request_body = base64.b64encode(iv + ciphertext).decode("utf-8")
+```
+**加密示例（PHP 代码）：**
+
+```php
+<?php
+// 我方提供的SM4对称密钥（16字节，示例密钥）
+$sm4Key = 'our_sm4_secure_key';
+// 原始业务数据（步骤1结果）
+$rawData = '{"account":"admin","password":"abc123456"}';
+
+// 步骤1：生成16字节随机IV（实际使用随机生成，示例固定IV仅作演示）
+$iv = openssl_random_pseudo_bytes(16);
+// 示例IV（实际请勿固定）：$iv = hex2bin('1234567890abcdef1234567890abcdef');
+
+// 步骤2：SM4-CBC加密（需确保PHP已支持SM4算法，部分环境需扩展支持）
+// 注意：openssl_encrypt的SM4算法标识可能因环境不同为'sm4'或'sm4-cbc'，需根据实际测试调整
+$cipherMethod = 'sm4-cbc';
+if (!in_array($cipherMethod, openssl_get_cipher_methods())) {
+    throw new Exception("当前PHP环境不支持SM4-CBC算法");
+}
+
+// 数据填充（SM4要求明文长度为16字节整数倍，使用PKCS7填充）
+$blockSize = openssl_cipher_iv_length($cipherMethod);
+$padLen = $blockSize - (strlen($rawData) % $blockSize);
+$paddedData = $rawData . str_repeat(chr($padLen), $padLen);
+
+// 执行加密（OPENSSL_RAW_DATA模式，不自动Base64编码）
+$cipherText = openssl_encrypt(
+    $paddedData,
+    $cipherMethod,
+    $sm4Key,
+    OPENSSL_RAW_DATA,
+    $iv
+);
+
+if ($cipherText === false) {
+    throw new Exception("SM4加密失败：" . openssl_error_string());
+}
+
+// 步骤3：拼接IV和密文，Base64编码得到请求体
+$requestBody = base64_encode($iv . $cipherText);
+// 最终request_body示例："EjRWeJq83vEkWt6xNDEyMzQ1Njc4OTBhYmNkZWYxMjM0NTY3ODkwYWJjZGVmQWRl..."
+echo "加密后的请求体：" . $requestBody . PHP_EOL;
+```
+**加密业务数据（Java 代码）**
+
+```java
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
+import java.security.Security;
+import java.util.Base64;
+
+public class Sm4Encryptor {
+    static {
+        // 加载BC库支持SM4（需引入bouncycastle依赖）
+        Security.addProvider(new BouncyCastleProvider());
+    }
+
+    // SM4算法常量
+    private static final String ALGORITHM = "SM4";
+    private static final String TRANSFORMATION = "SM4/CBC/PKCS7Padding";
+
+    public static String encrypt(String rawData, String sm4Key) throws Exception {
+        // 1. 生成16字节随机IV
+        byte[] iv = new byte[16];
+        SecureRandom random = new SecureRandom();
+        random.nextBytes(iv);
+        
+        // 2. 初始化SM4密钥和IV参数
+        SecretKeySpec keySpec = new SecretKeySpec(sm4Key.getBytes(StandardCharsets.UTF_8), ALGORITHM);
+        IvParameterSpec ivSpec = new IvParameterSpec(iv);
+        
+        // 3. SM4-CBC加密
+        Cipher cipher = Cipher.getInstance(TRANSFORMATION, "BC");
+        cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
+        byte[] encryptedBytes = cipher.doFinal(rawData.getBytes(StandardCharsets.UTF_8));
+        
+        // 4. 拼接IV和密文，Base64编码
+        byte[] ivAndCipher = new byte[iv.length + encryptedBytes.length];
+        System.arraycopy(iv, 0, ivAndCipher, 0, iv.length);
+        System.arraycopy(encryptedBytes, 0, ivAndCipher, iv.length, encryptedBytes.length);
+        
+        return Base64.getEncoder().encodeToString(ivAndCipher);
+    }
+
+    public static void main(String[] args) throws Exception {
+        // 我方提供的SM4对称密钥（16字节）
+        String sm4Key = "our_sm4_secure_key";
+        // 原始业务数据
+        String rawData = "{\"account\":\"admin\",\"password\":\"abc123456\"}";
+        
+        // 加密生成请求体
+        String requestBody = encrypt(rawData, sm4Key);
+        System.out.println("加密后的请求体：" + requestBody);
+        // 示例结果："EjRWeJq83vEkWt6xNDEyMzQ1Njc4OTBhYmNkZWYxMjM0NTY3ODkwYWJjZGVmQWRl..."
+    }
+}
+```
+### 4.4 步骤 4：发送 HTTP 请求
+**请求头要求：**
+
+| header头部字段 | 取值说明 |
+| --- | --- |
+| app-id | 我方分配的对接方唯一标识（必填）|
+| sign | 步骤 2 生成的签名串（必填） |
+|Content-Type|固定为 application/json（必填）|
+
+**请求体要求：**
+- 仅包含步骤 3 生成的 Base64 编码字符串（无需额外 JSON 包装）。
+
+**请求示例：**
+
+```
+POST /api/xxx HTTP/1.1
+Host: 我方接口域名
+app-id: YOUR_ASSIGNED_APP_ID
+sign: BASE64_ENCODED_SIGN
+Content-Type: application/json
+Content-Length: 123
+
+BASE64_ENCODED_ENCRYPTED_DATA
+```
+## 五、响应解析规范（我方 → 对接方）
+我方返回的响应数据已加密并签名，对接方需按以下步骤解析：
+### 5.1 步骤 1：Base64 解码响应体
+- 对我方返回的响应体字符串进行 Base64 解码，得到 IV + 密文 的原始字节数据。
+### 5.2 步骤 2：SM4 解密数据
+1. 从解码后的字节数据中，截取前 16 字节作为 IV 向量；
+2. 剩余部分作为 SM4 密文；
+3. 使用SM4 对称密钥、截取的 IV 向量，对密文进行 SM4-CBC 解密，得到 JSON 格式的字符串（包含业务数据和签名）。
+
+**解密示例（伪代码 python）：**
+
+```
+# 响应体Base64解码
+decoded_data = base64.b64decode(response_body)
+# 分离IV和密文
+iv_resp = decoded_data[:16]
+ciphertext_resp = decoded_data[16:]
+# SM4-CBC解密
+cipher = Cipher(algorithms.SM4(sm4_key), modes.CBC(iv_resp))
+decryptor = cipher.decryptor()
+decrypted_data = decryptor.update(ciphertext_resp) + decryptor.finalize()
+# 去除填充，得到JSON字符串
+raw_resp_json = decrypted_data.rstrip(b"\x00").decode("utf-8")
+resp_data = json.loads(raw_resp_json)
+```
+**解密示例（PHP 代码）**：
+```
+<?php
+// 我方返回的响应体
+$responseBody = 'EjRWeJq83vEkWt6xRGVjMjAxNTA1MDEwMDFfU0VDU0lPTl9WQUxJRF9BVEVFQg==';
+// 我方提供的SM4对称密钥（16字节）
+$sm4Key = 'our_sm4_secure_key';
+$cipherMethod = 'sm4-cbc';
+
+// 步骤1：Base64解码响应体
+$decodedData = base64_decode($responseBody);
+if ($decodedData === false) {
+    throw new Exception("响应体Base64解码失败");
+}
+
+// 步骤2：分离IV和密文（前16字节为IV）
+$ivResp = substr($decodedData, 0, 16);
+$cipherTextResp = substr($decodedData, 16);
+
+if (strlen($ivResp) !== 16 || empty($cipherTextResp)) {
+    throw new Exception("响应数据格式错误，无法分离IV和密文");
+}
+
+// 步骤3：SM4-CBC解密
+$decryptedPaddedData = openssl_decrypt(
+    $cipherTextResp,
+    $cipherMethod,
+    $sm4Key,
+    OPENSSL_RAW_DATA,
+    $ivResp
+);
+
+if ($decryptedPaddedData === false) {
+    throw new Exception("SM4解密失败：" . openssl_error_string());
+}
+
+// 步骤4：去除PKCS7填充
+$padLen = ord(substr($decryptedPaddedData, -1));
+$decryptedData = substr($decryptedPaddedData, 0, -$padLen);
+
+// 步骤5：得到JSON字符串（包含业务数据和sign字段）
+$rawRespJson = $decryptedData;
+// 示例结果：'{"code":200,"msg":"success","data":{"order_status":"paid","trade_no":"T2024050100001"},"sign":"xYz123AbcDefGhIjKlMnOpQrStUvWx+/="}'
+$respData = json_decode($rawRespJson, true);
+
+if (json_last_error() !== JSON_ERROR_NONE) {
+    throw new Exception("解密后数据JSON解析失败：" . json_last_error_msg());
+}
+
+echo "解密后的响应数据：" . print_r($respData, true) . PHP_EOL;
+```
+**SM4 解密数据（Java 代码）**
+
+```
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.security.Security;
+import java.util.Base64;
+
+public class Sm4Decryptor {
+    static {
+        Security.addProvider(new BouncyCastleProvider());
+    }
+
+    private static final String ALGORITHM = "SM4";
+    private static final String TRANSFORMATION = "SM4/CBC/PKCS7Padding";
+
+    public static String decrypt(String responseBody, String sm4Key) throws Exception {
+        // 1. Base64解码响应体
+        byte[] ivAndCipher = Base64.getDecoder().decode(responseBody);
+        
+        // 2. 分离IV（前16字节）和密文
+        byte[] iv = new byte[16];
+        byte[] cipherText = new byte[ivAndCipher.length - 16];
+        System.arraycopy(ivAndCipher, 0, iv, 0, 16);
+        System.arraycopy(ivAndCipher, 16, cipherText, 0, cipherText.length);
+        
+        // 3. 初始化SM4密钥和IV参数
+        SecretKeySpec keySpec = new SecretKeySpec(sm4Key.getBytes(StandardCharsets.UTF_8), ALGORITHM);
+        IvParameterSpec ivSpec = new IvParameterSpec(iv);
+        
+        // 4. SM4-CBC解密
+        Cipher cipher = Cipher.getInstance(TRANSFORMATION, "BC");
+        cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
+        byte[] decryptedBytes = cipher.doFinal(cipherText);
+        
+        // 5. 转换为字符串（包含业务数据和sign字段）
+        return new String(decryptedBytes, StandardCharsets.UTF_8);
+    }
+
+    public static void main(String[] args) throws Exception {
+        // 我方返回的响应体
+        String responseBody = "EjRWeJq83vEkWt6xRGVjMjAxNTA1MDEwMDFfU0VDU0lPTl9WQUxJRF9BVEVFQg==";
+        // 我方提供的SM4对称密钥
+        String sm4Key = "our_sm4_secure_key";
+        
+        // 解密
+        String rawRespJson = decrypt(responseBody, sm4Key);
+        System.out.println("解密后的响应数据：" + rawRespJson);
+        // 示例结果：'{"code":200,"msg":"success","data":{"order_status":"paid","trade_no":"T2024050100001"},"sign":"xYz123AbcDefGhIjKlMnOpQrStUvWx+/="}'
+    }
+}
+```
+### 5.3 步骤 3：验证响应签名（防篡改）
+1. 从解密后的 JSON 数据中提取sign字段（我方生成的签名串，Base64 编码）；
+2. 移除 JSON 数据中的sign字段，重新将剩余业务数据编码为 JSON 字符串（编码规则：JSON_UNESCAPED_UNICODE，无多余空格）；
+3. 对提取的sign字段进行 Base64 解码，得到原始签名数据；
+4. 使用我方提供的服务端 RSA 公钥，对重新编码后的业务 JSON 字符串进行 SHA-256 签名验证；
+5. 验证通过则可使用业务数据，验证失败则丢弃该响应。
+
+**验签示例（伪代码 python）：**
+
+```
+# 提取我方签名并解码
+server_sign = base64.b64decode(resp_data.pop("sign"))
+# 重新编码业务数据（移除sign后）
+verify_data = json.dumps(resp_data, ensure_ascii=False).encode("utf-8")
+# 我方提供的服务端公钥
+server_public_key = RSA.import_key("我方提供的服务端RSA公钥")
+# 验证签名
+hash_obj = SHA256.new(verify_data)
+try:
+    pkcs1_15.new(server_public_key).verify(hash_obj, server_sign)
+    print("验签成功，业务数据有效")
+except (ValueError, TypeError):
+    print("验签失败，数据可能被篡改")
+```
+**验签示例（PHP 代码）：**
+
+```
+<?php
+// 我方提供的服务端RSA公钥（示例公钥）
+$serverPublicKey = <<<PUBLIC_KEY
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxDBCurtqHuld3Rw...（省略中间内容）...
+AwIDAQAB
+-----END PUBLIC KEY-----
+PUBLIC_KEY;
+
+// 步骤1：解密后的响应数据（步骤4.2结果）
+$respData = [
+    "code" => 200,
+    "msg" => "success",
+    "data" => ["order_status" => "paid", "trade_no" => "T2024050100001"],
+    "sign" => "xYz123AbcDefGhIjKlMnOpQrStUvWx+/"
+];
+
+// 步骤2：提取并解码服务端签名
+$serverSignBase64 = $respData['sign'];
+unset($respData['sign']); // 移除sign字段
+$serverSign = base64_decode($serverSignBase64);
+
+if ($serverSign === false) {
+    throw new Exception("服务端签名Base64解码失败");
+}
+
+// 步骤3：重新编码业务数据（保持与服务端一致的格式）
+$verifyData = json_encode($respData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+// 编码后结果：'{"code":200,"msg":"success","data":{"order_status":"paid","trade_no":"T2024050100001"}}'
+
+// 步骤4：执行验签（OPENSSL_ALGO_SHA256对应SHA-256哈希算法）
+$verifyResult = openssl_verify($verifyData, $serverSign, $serverPublicKey, OPENSSL_ALGO_SHA256);
+
+if ($verifyResult === 1) {
+    echo "验签成功，业务数据有效" . PHP_EOL;
+    echo "最终业务数据：" . print_r($respData, true) . PHP_EOL;
+} elseif ($verifyResult === 0) {
+    throw new Exception("验签失败，数据可能被篡改");
+} else {
+    throw new Exception("验签过程错误：" . openssl_error_string());
+}
+```
+**验证响应签名（Java 代码）**
+
+```
+import com.alibaba.fastjson.JSONObject;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyFactory;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
+
+public class SignVerifier {
+    public static boolean verifySign(JSONObject respData, String serverPublicKeyStr) throws Exception {
+        // 1. 提取并解码服务端签名
+        String signBase64 = respData.getString("sign");
+        respData.remove("sign"); // 移除sign字段
+        byte[] signBytes = Base64.getDecoder().decode(signBase64);
+        
+        // 2. 重新编码业务数据（保持与服务端一致格式）
+        String verifyData = JSONObject.toJSONString(respData); // 自动禁用Unicode转义
+        
+        // 3. 解码服务端公钥（PEM格式）
+        String publicKeyPem = serverPublicKeyStr
+                .replace("-----BEGIN PUBLIC KEY-----", "")
+                .replace("-----END PUBLIC KEY-----", "")
+                .replaceAll("\\s+", "");
+        byte[] publicKeyBytes = Base64.getDecoder().decode(publicKeyPem);
+        
+        // 4. 加载公钥
+        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicKeyBytes);
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        PublicKey publicKey = keyFactory.generatePublic(keySpec);
+        
+        // 5. 验证签名
+        Signature signature = Signature.getInstance("SHA256withRSA");
+        signature.initVerify(publicKey);
+        signature.update(verifyData.getBytes(StandardCharsets.UTF_8));
+        
+        return signature.verify(signBytes);
+    }
+
+    public static void main(String[] args) throws Exception {
+        // 我方提供的服务端RSA公钥（示例公钥）
+        String serverPublicKey = "-----BEGIN PUBLIC KEY-----\n" +
+                "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxDBCurtqHuld3Rw...（省略中间内容）...\n" +
+                "AwIDAQAB\n" +
+                "-----END PUBLIC KEY-----";
+        
+        // 解密后的响应数据（JSON格式）
+        String rawRespJson = "{\"code\":200,\"msg\":\"success\",\"data\":{\"order_status\":\"paid\",\"trade_no\":\"T2024050100001\"},\"sign\":\"xYz123AbcDefGhIjKlMnOpQrStUvWx+/=\"}";
+        JSONObject respData = JSONObject.parseObject(rawRespJson);
+        
+        // 验签
+        boolean verifyResult = verifySign(respData, serverPublicKey);
+        if (verifyResult) {
+            System.out.println("验签成功，业务数据有效");
+            System.out.println("最终业务数据：" + respData);
+        } else {
+            throw new Exception("验签失败，数据可能被篡改");
+        }
+    }
+}
+```
+
+## 六、错误处理与排查
+### 6.1 常见错误说明
+
+| 错误现象   | 可能原因 |排查方向|
+| --- | --- | --- |
+| 接口返回 “缺少签名” | 请求头未携带sign字段，或sign为空 |检查sign生成逻辑和请求头配置|
+|接口返回 “app-id 错误”|app-id未携带、不存在或未绑定公钥|核对我方分配的app-id，确认已向我方提供 RSA 公钥并完成绑定|
+|接口返回 “签名验证失败”|签名生成时使用的私钥与提供给我方的公钥不匹配；原始数据编码格式不一致；数据被篡改|核对 RSA 密钥对；检查 JSON 编码是否禁用 Unicode 转义；确认请求数据未被修改|
+
+### 6.2 对接前自查清单
+
+1. 已获取我方提供的app-id、SM4 对称密钥、服务端 RSA 公钥；
+2. 已向我方提供对接方自身的 RSA 公钥（用于请求验签）；
+3. 签名生成时使用对接方私钥，验签时使用对应公钥（密钥对匹配）；
+4. JSON 编码统一使用JSON_UNESCAPED_UNICODE，无格式化、无多余空格；
+5. SM4 加密时 IV 向量每次随机生成（16 字节），且按 “IV + 密文” 格式拼接；
+6. 所有 Base64 编码 / 解码使用标准格式（不使用 URL-Safe 变体）。
+
+## 七、安全注意事项
+1. 密钥安全：
+
+- SM4 对称密钥和对接方 RSA 私钥需严格保密，禁止明文存储或传输；
+- 密钥需定期更换（更换时需双方同步更新）。
+2. 数据传输：
+- 建议接口使用 HTTPS 协议传输，进一步提升安全性；
+- 禁止在请求 / 响应中携带密钥、私钥等敏感信息。
+
+3. 签名与加密：
+- 每次请求必须重新生成签名和 IV 向量，不可复用；
+- 业务数据需完整参与签名（不可遗漏字段），避免部分数据未被验证。
+
+4. 异常处理：
+- 签名验证失败或解密失败时，需直接丢弃数据，不可继续使用；
+- 记录异常日志（如验签失败、解密失败），便于排查问题。
+
+## 八、对接支持
+**若对接过程中遇到问题，可提供以下信息联系我方排查：**
+1. 完整的请求头（隐去敏感信息）；
+2. 加密后的请求体；
+3. 我方返回的响应体；
+4. 本地签名生成、加密 / 解密的关键代码片段（隐去密钥）。

@@ -8,57 +8,101 @@
     "light": "#26BD6C",
     "dark": "#166E3F"
   },
+  "appearance": { "default": "system" },
   "favicon": "/images/Jko-32.svg",
   "icons": {
     "library": "lucide"
   },
   "styling": {
-    "eyebrows": "breadcrumbs"
+    "eyebrows": "section",
+    "codeblocks": "system"
   },
   "contextual": {
-    "options": [
-      "chatgpt",
-      "mcp",
-      "view",
-      "copy"
-    ]
+    "options": ["chatgpt", "mcp", "view", "copy"]
+  },
+  "api": {
+    "openapi": {
+      "source": "openapi_2.json"
+    },
+    "playground": {
+      "display": "interactive"
+    },
+    "examples": {
+      "languages": ["curl", "javascript", "python"],
+      "defaults": "required",
+      "prefill": true,
+      "autogenerate": true
+    }
   },
   "navigation": {
-    "directory": "card",
-    "anchors": [
+    "languages": [
       {
-        "anchor": "技灵营销助手",
-        "pages": [
+        "language": "cn",
+        "dropdowns": [
           {
-            "group": "简介",
-            "icon": "layers",
-            "expanded": true,
-            "pages": [
-              "intro/what-is-jeekmind",
-              "intro/contactus"
+            "dropdown": "使用文档",
+            "icon": "book-open",
+            "directory": "card",
+            "anchors": [
+              {
+                "anchor": "技灵营销助手",
+                "pages": [
+                  {
+                    "group": "简介",
+                    "icon": "layers",
+                    "expanded": true,
+                    "pages": ["intro/what-is-jeekmind", "intro/contactus"]
+                  },
+                  {
+                    "group": "功能详情",
+                    "icon": "ruler",
+                    "pages": ["feature/script-agent"]
+                  },
+                  {
+                    "group": "实用技巧",
+                    "icon": "lightbulb",
+                    "pages": ["guide/jko-gen-face-video"]
+                  }
+                ]
+              },
+              {
+                "anchor": "知识星球",
+                "icon": "earth",
+                "pages": []
+              }
             ]
           },
           {
-            "group": "功能详情",
-            "icon": "ruler",
-            "pages": [
-              "feature/script-agent"
-            ]
-          },
-          {
-            "group": "实用技巧",
-            "icon": "lightbulb",
-            "pages": [
-              "guide/jko-gen-face-video"
+            "dropdown": "开发文档",
+            "icon": "book-open",
+            "directory": "card",
+            "anchors": [
+              {
+                "anchor": "开放端接入",
+                "pages": [
+                  {
+                    "group": "加密",
+                    "icon": "lightbulb",
+                    "pages": ["dev/open/connection"]
+                  }
+                ]
+              },
+              {
+                "anchor": "测试 API 布局",
+                "pages": [
+                  {
+                    "group": "Plant Store API",
+                    "icon": "leaf",
+                    "openapi": "openapi_2.json"
+                  }
+                ]
+              }
             ]
           }
         ]
       },
       {
-        "anchor": "知识星球",
-        "icon": "earth",
-        "pages": [
-        ]
+        "language": "en"
       }
     ]
   },
@@ -67,10 +111,12 @@
     "dark": "/images/Jko-logo-word-white.png"
   },
   "navbar": {
-    "links": [{
-      "label": "联系我们",
-      "href": "/intro/contactus"
-    }],
+    "links": [
+      {
+        "label": "联系我们",
+        "href": "/intro/contactus"
+      }
+    ],
     "primary": {
       "type": "button",
       "label": "开始使用",
@@ -80,25 +126,18 @@
   "metadata": {
     "timestamp": true
   },
-  "api": {
-    "examples": {
-      "languages": [
-        "cURL"
-      ]
-    }
-  },
   "fonts": {
     "family": "Segoe UI",
     "source": "https://cdn.jsdelivr.net/npm/segoe-fonts@1.0.1/fonts/normal/segoeui.woff",
     "format": "woff"
   },
   "integrations": {
-      "clarity": {
-          "projectId": "x7vzg0r2d9"
-      },
-      "ga4": {
-        "measurementId": "G-CZZRF4LXCR"
-      }
+    "clarity": {
+      "projectId": "x7vzg0r2d9"
+    },
+    "ga4": {
+      "measurementId": "G-CZZRF4LXCR"
+    }
   },
   "seo": {
     "indexing": "navigable",
