@@ -99,8 +99,8 @@
     ]
   },
   "logo": {
-    "light": "/images/Jko-logo-word.png",
-    "dark": "/images/Jko-logo-word-white.png"
+    "light": "images/Jko-logo-w128.png",
+    "dark": "images/Jko-logo-w128-white.png"
   },
   "navbar": {
     "links": [
