@@ -33,75 +33,36 @@
     }
   },
   "navigation": {
-    "languages": [
+    "dropdowns": [
       {
-        "language": "cn",
-        "dropdowns": [
+        "dropdown": "Untitled Dropdown",
+        "anchors": [
           {
-            "dropdown": "使用文档",
-            "icon": "book-open",
-            "directory": "card",
-            "anchors": [
+            "anchor": "技灵营销助手",
+            "pages": [
               {
-                "anchor": "技灵营销助手",
-                "pages": [
-                  {
-                    "group": "简介",
-                    "icon": "layers",
-                    "expanded": true,
-                    "pages": ["intro/what-is-jeekmind", "intro/contactus"]
-                  },
-                  {
-                    "group": "功能详情",
-                    "icon": "ruler",
-                    "pages": ["feature/script-agent"]
-                  },
-                  {
-                    "group": "实用技巧",
-                    "icon": "lightbulb",
-                    "pages": ["guide/jko-gen-face-video"]
-                  }
-                ]
+                "group": "简介",
+                "icon": "layers",
+                "expanded": true,
+                "pages": []
               },
               {
-                "anchor": "知识星球",
-                "icon": "earth",
+                "group": "功能详情",
+                "icon": "ruler",
+                "pages": []
+              },
+              {
+                "group": "实用技巧",
+                "icon": "lightbulb",
                 "pages": []
               }
             ]
           },
           {
-            "dropdown": "开发文档",
-            "icon": "book-open",
-            "directory": "card",
-            "anchors": [
-              {
-                "anchor": "开放端接入",
-                "pages": [
-                  {
-                    "group": "加密",
-                    "icon": "lightbulb",
-                    "pages": ["dev/open/connection"]
-                  }
-                ]
-              },
-              {
-                "anchor": "开放端 API 文档",
-                "openapi": "apidoc/toopen.json"
-              },
-              {
-                "anchor": "开放端 API（新）",
-                "openapi": {
-                  "source": "apidoc/toopen-withoutEnc.json",
-                  "directory": "open-api-new"
-                }
-              }
-            ]
+            "anchor": "知识星球",
+            "icon": "earth"
           }
         ]
-      },
-      {
-        "language": "en"
       }
     ]
   },
