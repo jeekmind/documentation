@@ -21,7 +21,7 @@
     "options": ["chatgpt", "mcp", "view", "copy"]
   },
   "api": {
-    "openapi": "toopen.json",
+    "openapi": "apidoc/toopen.json",
     "playground": {
       "display": "interactive"
     },
@@ -87,7 +87,14 @@
               },
               {
                 "anchor": "开放端 API 文档",
-                "openapi": "toopen.json"
+                "openapi": "apidoc/toopen.json"
+              },
+              {
+                "anchor": "开放端 API（新）",
+                "openapi": {
+                  "source": "apidoc/toopen-withoutEnc.json",
+                  "directory": "open-api-new"
+                }
               }
             ]
           }

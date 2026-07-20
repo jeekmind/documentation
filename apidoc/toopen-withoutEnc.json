@@ -1,0 +1,631 @@
+{
+  "info": {
+    "title": "AI智能助手（新）",
+    "version": "1.0.0",
+    "description": "# 一、接口对接概述\n## 1.1 对接流程总览\n### 所有功能接口均遵循统一的加密、签名、身份验证规范，核心流程如下：\n1. 对接方先通过登录接口获取有效 Token（身份凭证）；\n2. 对接方构造业务请求参数，先对参数做 RSA-SHA256 加签，再对参数做 SM4-CBC 加密；\n3. 对接方将 Token、签名、app-id 放入请求 Header，加密后的参数放入请求 Body 发起请求；\n4. 服务端依次完成：Token 验证 → app-id 校验 → SM4 解密 → RSA 验签 → 业务逻辑处理；\n5. 服务端对响应数据加签 + SM4 加密后返回，对接方解密并验签获取最终数据。\n## 1.2 通用接口信息\n\n| 项 | 统一规范 |\n| --- | --- |\n| 数据传输 | 基于 HTTP/1.1 协议 |\n| 签名算法 | RSA-SHA256（非对称加签 / 验签） |\n| 加密算法 | SM4-CBC（16 字节密钥，16 字节 IV） |\n| X-token 传递 | Header 中 X-token 字段 |\n| 字符编码 | UTF-8（全程统一） |\n# 二、前置准备\n## 2.1 密钥 / 凭证获取\n对接前需从服务端方获取以下核心信息：\n\n| 名称 | 用途 |\n| --- | --- |\n| app-id | 对接方唯一标识，服务端用于匹配公钥 / 站点信息 |\n|SM4 加密密钥（请求）|\ttoopen_api_key（16 字节），用于对接方加密请求参数、服务端解密|\n|SM4 加密密钥（响应）|toopen_api_output_key（16 字节），用于服务端加密响应、对接方解密|\n|服务端 RSA 公钥|对接方用于验证服务端响应数据的签名|\n|对接方 RSA 公钥|提供给服务端，用于验证对接方请求签名|\n|对接方 RSA 私钥|对接方自行保管，用于对请求参数加签|\n## 2.2 Token 获取\n### 2.2.1 登录接口信息\n\n| 项 | 内容 |\n| --- | --- |\n| 接口路径 | auth/getToken |\n|请求方式|POST|\n|是否加密|\t是（遵循通用加密 / 签名规范）|\n# 三、通用请求规范\n## 3.1 请求 Header 格式\n所有功能接口请求必须包含以下 Header 字段：\n\n| 字段名 | 必选 | 类型 | 说明 |\n| --- | --- | --- | --- |\n| Token | 是 | string | 登录接口获取的有效 Token |\n| app-id | 是 | string | 对接方唯一标识 |\n| sign | 是 | string | 对加密前原始请求参数的 RSA 签名（Base64 编码） |\n|Content-Type|是|string|固定值：application/octet-stream（因 Body 为加密后的二进制数据）|\n## 3.2 请求参数处理流程（对接方侧）\n### 步骤 1：构造原始业务参数\n根据具体功能接口的要求，构造 JSON 格式的原始参数（示例）：\n\n```json\n{\n  \"product_id\": \"123456\",\n  \"brand\": \"示例品牌\",\n  \"functional_highlights\": \"示例功能亮点\"\n}\n```\n### 步骤 2：生成 RSA 签名\n1. 将原始参数序列化为无 Unicode 转义的 JSON 字符串（记为 plainText）；\n2. 使用对接方 RSA 私钥对 plainText 做 RSA-SHA256 签名，得到二进制签名值；\n3. 将二进制签名值做 Base64 编码，得到最终的 sign 值（放入 Header）。\n### 步骤 3：SM4-CBC 加密参数\n1. 生成 16 字节随机 IV（建议使用加密安全的随机数生成器）；\n2. 使用服务端提供的 toopen_api_key，对 plainText 做 SM4-CBC 加密（PKCS7 补位），得到密文；\n3. 拼接 IV + 密文（IV 在前，密文在后）；\n4. 对拼接后的字节流做 Base64 编码，作为请求 Body 提交。\n## 3.3 签名 / 加密伪代码（通用）\n\n\n```\n# 伪代码：对接方请求参数处理\nimport json\nimport base64\nfrom Crypto.Cipher import SM4\nfrom Crypto.Signature import pkcs1_15\nfrom Crypto.Hash import SHA256\nfrom Crypto.PublicKey import RSA\n\n# 1. 构造原始参数\nraw_params = {\"product_id\": \"123456\", \"brand\": \"示例品牌\"}\nplain_text = json.dumps(raw_params, ensure_ascii=False)  # 禁用Unicode转义\n\n# 2. RSA-SHA256 加签\nprivate_key = RSA.import_key(\"对接方RSA私钥（带BEGIN/END）\")\nhash_obj = SHA256.new(plain_text.encode(\"utf-8\"))\nsign = pkcs1_15.new(private_key).sign(hash_obj)\nsign_base64 = base64.b64encode(sign).decode(\"utf-8\")  # Header中的sign值\n\n# 3. SM4-CBC 加密\nsm4_key = b\"服务端提供的toopen_api_key\"  # 16字节\niv = bytes([0] * 16)  # 16字节随机IV\ncipher = SM4.new(sm4_key, SM4.MODE_CBC, iv)\npadding_len = 16 - (len(plain_text.encode(\"utf-8\")) % 16)\npadded_data = plain_text.encode(\"utf-8\") + bytes([padding_len] * padding_len)\ncipher_text = cipher.encrypt(padded_data)\nencrypt_body = base64.b64encode(iv + cipher_text).decode(\"utf-8\")  # 请求Body值\n```\n# 四、通用响应规范\n## 4.1 响应数据处理流程（对接方侧）\n1. 接收服务端返回的 Base64 编码字符串，做 Base64 解码得到字节流；\n2. 从字节流中分离前 16 字节为 IV，剩余部分为密文；\n3. 使用 toopen_api_output_key 对密文做 SM4-CBC 解密，得到 JSON 字符串；\n4. 解析 JSON 字符串，分离 sign 字段和业务数据字段；\n5. 将业务数据重新序列化为无 Unicode 转义的 JSON 字符串；\n6. 使用服务端 RSA 公钥验证 sign 字段的有效性；\n7. 验签通过后，解析业务数据为可用格式。\n\n## 4.2 响应数据格式（解密后）\n\n```json\n{\n  \"code\": 100,\n  \"msg\": \"success\",\n  \"data\": {},  // 具体接口的业务数据\n  \"sign\": \"Base64编码的RSA签名\"  // 对data字段的签名\n}\n```\n## 4.3 响应验签伪代码（通用）\n\n```\n# 伪代码：对接方响应验签\nimport json\nimport base64\nfrom Crypto.Signature import pkcs1_15\nfrom Crypto.Hash import SHA256\nfrom Crypto.PublicKey import RSA\n\n# 1. 解密后得到的响应JSON字符串\ndecrypt_response = '{\"code\":0,\"msg\":\"success\",\"data\":{\"product_id\":\"123456\"},\"sign\":\"xxx\"}'\nresponse_data = json.loads(decrypt_response)\n\n# 2. 分离签名和业务数据\nsign_base64 = response_data.pop(\"sign\")\ndata_str = json.dumps(response_data[\"data\"], ensure_ascii=False)\n\n# 3. 验签\npublic_key = RSA.import_key(\"服务端RSA公钥（带BEGIN/END）\")\nhash_obj = SHA256.new(data_str.encode(\"utf-8\"))\nsign = base64.b64decode(sign_base64)\ntry:\n    pkcs1_15.new(public_key).verify(hash_obj, sign)\n    print(\"验签通过，业务数据可用\")\nexcept:\n    print(\"验签失败，数据可能被篡改\")\n```\n# 五、错误码规范\n\n| 错误码 | 分类 | 说明 | 对接方处理建议 |\n| --- | --- | --- | --- |\n| 100 | 成功 | 业务处理完成 | 正常解析 data 字段 |\n# 六、接口调试与联调要点\n## 6.1 调试工具建议\n- 接口调试：Postman/ApiPost（支持自定义 Header、二进制 Body）；\n- 加解密测试：先通过本地脚本验证加解密 / 签名逻辑，再联调接口；\n- 日志排查：对接方记录请求 / 响应的原始加密数据、签名值，便于定位问题。"
+  },
+  "openapi": "3.1.0",
+  "components": {
+    "schemas": {
+      "TaskCreatedResponse": {
+        "type": "object",
+        "required": [
+          "status",
+          "message",
+          "data"
+        ],
+        "properties": {
+          "status": {
+            "type": "integer",
+            "description": "业务状态码",
+            "example": 100
+          },
+          "message": {
+            "type": "string",
+            "description": "提示信息",
+            "example": "操作成功"
+          },
+          "data": {
+            "type": "object",
+            "required": [
+              "id",
+              "status",
+              "amount"
+            ],
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "任务 ID",
+                "example": 11
+              },
+              "status": {
+                "type": "string",
+                "description": "任务状态",
+                "example": "Running"
+              },
+              "amount": {
+                "type": "number",
+                "description": "消耗金额或算力",
+                "example": 100
+              }
+            }
+          }
+        }
+      },
+      "TaskResultResponse": {
+        "type": "object",
+        "required": [
+          "status",
+          "message",
+          "data"
+        ],
+        "properties": {
+          "status": {
+            "type": "integer",
+            "description": "业务状态码",
+            "example": 100
+          },
+          "message": {
+            "type": "string",
+            "description": "提示信息",
+            "example": "操作成功"
+          },
+          "data": {
+            "type": "object",
+            "required": [
+              "id",
+              "status",
+              "response_json"
+            ],
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "任务 ID",
+                "example": 20
+              },
+              "status": {
+                "type": "string",
+                "description": "任务状态",
+                "example": "Success"
+              },
+              "response_json": {
+                "description": "任务生成结果，可为 JSON 数据或字符串"
+              }
+            }
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "description": "业务状态码"
+          },
+          "message": {
+            "type": "string",
+            "description": "错误信息"
+          },
+          "data": {
+            "description": "错误详情"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "视频生成",
+      "description": "AI 视频生成及任务结果查询接口。"
+    }
+  ],
+  "paths": {
+    "/workflow/liveAiVideo": {
+      "post": {
+        "summary": "seedance（支持人脸）",
+        "tags": [
+          "视频生成"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "prompt": {
+                    "type": "string",
+                    "description": "文本提示词",
+                    "example": "景别：中景\\\\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\\\\n表演/动作：先回头微笑，再自然挥手。\\\\n镜头建议：镜头稳定，中景构图保留建筑背景。",
+                    "default": "景别：中景\\\\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\\\\n表演/动作：先回头微笑，再自然挥手。\\\\n镜头建议：镜头稳定，中景构图保留建筑背景。"
+                  },
+                  "resolution_option": {
+                    "type": "string",
+                    "description": "分辨率（1：480P（只有seedance2.0可选）\n2：720P\n3：1080P（seedance2.0没有1080P））",
+                    "example": "1",
+                    "default": "1"
+                  },
+                  "duration": {
+                    "type": "string",
+                    "description": "时长",
+                    "example": "5",
+                    "default": "5"
+                  },
+                  "aspect_ratio": {
+                    "type": "string",
+                    "description": "画面比例（1:【16:9】。2:【9:16】。3:【1:1】。4:【4:3】。5:【3:4】）",
+                    "example": "3",
+                    "default": "3"
+                  },
+                  "channel_option": {
+                    "type": "string",
+                    "description": "渠道（1 渠道一）",
+                    "example": "1",
+                    "default": "2"
+                  },
+                  "reference_urls": {
+                    "type": "array",
+                    "description": "参考图/视频/音频视频:（仅支持mp4、mov格式，分辨率480P、、720P，时长2~15s(总时长不超过15s)，单视频不超过50MB;\n图片:单图小于30MB(总大小不超过64MB)\n音频:仅支持wav、mp3格式，时长2~15s，单个音频不超过15MB;）\n",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "prompt",
+                  "resolution_option",
+                  "duration",
+                  "aspect_ratio",
+                  "channel_option"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskCreatedResponse"
+                },
+                "example": {
+                  "status": 100,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 11,
+                    "status": "Running",
+                    "amount": 100
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "createLiveAiVideo"
+      }
+    },
+    "/workflow/seedanceAiVideo": {
+      "post": {
+        "summary": "seedance",
+        "tags": [
+          "视频生成"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "prompt": {
+                    "type": "string",
+                    "description": "长度不超过800个字",
+                    "example": "景别：中景\\\\n画面内容：小青背对镜头站在展馆前，随后转身回头，朝镜头招手打招呼；接着再朝镜头外挥手。\\\\n表演/动作：先回头微笑，再自然挥手。\\\\n镜头建议：镜头稳定，中景构图保留建筑背景。",
+                    "default": "景别：中景\\\\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\\\\n表演/动作：先回头微笑，再自然挥手。\\\\n镜头建议：镜头稳定，中景构图保留建筑背景。"
+                  },
+                  "resolution_option": {
+                    "type": "string",
+                    "description": "分辨率（1：480P（只有seedance2.0可选）\n2：720P\n3：1080P（seedance2.0没有1080P））",
+                    "example": "1",
+                    "default": "1"
+                  },
+                  "duration": {
+                    "type": "integer",
+                    "description": "时长",
+                    "example": 5
+                  },
+                  "aspect_ratio": {
+                    "type": "string",
+                    "description": "画面比例（1:【16:9】。2:【9:16】。3:【1:1】。4:【4:3】。5:【3:4】）",
+                    "example": "3",
+                    "default": "3"
+                  },
+                  "channel_option": {
+                    "type": "string",
+                    "description": "渠道（1 生成视频-即梦seedance2.0 满血 3 生成视频-即梦seedance2.0-fast 4 生成视频-即梦seedance2.0-mini）",
+                    "example": "1",
+                    "default": "2"
+                  },
+                  "reference_urls": {
+                    "type": "array",
+                    "description": "参考图/视频/音频",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "prompt",
+                  "resolution_option",
+                  "duration",
+                  "aspect_ratio",
+                  "channel_option"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskCreatedResponse"
+                },
+                "example": {
+                  "status": 100,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 11,
+                    "status": "Running",
+                    "amount": 100
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "createSeedanceAiVideo"
+      }
+    },
+    "/workflow/getResult": {
+      "post": {
+        "summary": "获取生成结果",
+        "tags": [
+          "视频生成"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number",
+                    "description": "会话ID",
+                    "example": 1
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskResultResponse"
+                },
+                "example": {
+                  "status": 100,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 20,
+                    "status": "Success",
+                    "response_json": "Example content."
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "getVideoGenerationResult"
+      }
+    },
+    "/workflow/aiVideo": {
+      "post": {
+        "summary": "谷歌omni",
+        "tags": [
+          "视频生成"
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "prompt": {
+                    "type": "string",
+                    "description": "文本提示词",
+                    "example": "景别：中景\\\\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\\\\n表演/动作：先回头微笑，再自然挥手。\\\\n镜头建议：镜头稳定，中景构图保留建筑背景。",
+                    "default": "景别：中景\\\\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\\\\n表演/动作：先回头微笑，再自然挥手。\\\\n镜头建议：镜头稳定，中景构图保留建筑背景。"
+                  },
+                  "aspect_ratio": {
+                    "type": "string",
+                    "description": "画面比例（1:【16:9】。2:【9:16】。3:【1:1】。4:【4:3】。5:【3:4】）",
+                    "example": "3",
+                    "default": "3"
+                  },
+                  "duration": {
+                    "type": "integer",
+                    "description": "需要生产视频的时长（最多10秒）",
+                    "example": 5
+                  },
+                  "resolution_option": {
+                    "type": "string",
+                    "description": "分辨率\n2：720P\n3：1080P",
+                    "example": "1",
+                    "default": "1"
+                  }
+                },
+                "required": [
+                  "prompt",
+                  "aspect_ratio",
+                  "duration",
+                  "resolution_option"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskCreatedResponse"
+                },
+                "example": {
+                  "status": 100,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 11,
+                    "status": "Running",
+                    "amount": 100
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "createOmniVideo"
+      }
+    },
+    "/workflow/seedanceDiscount": {
+      "post": {
+        "summary": "seedance 2.0-限时折扣（支持人脸）",
+        "tags": [
+          "视频生成"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "prompt": {
+                    "type": "string",
+                    "description": "文本提示词",
+                    "example": "景别：中景\\\\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\\\\n表演/动作：先回头微笑，再自然挥手。\\\\n镜头建议：镜头稳定，中景构图保留建筑背景。",
+                    "default": "景别：中景\\\\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\\\\n表演/动作：先回头微笑，再自然挥手。\\\\n镜头建议：镜头稳定，中景构图保留建筑背景。"
+                  },
+                  "resolution_option": {
+                    "type": "integer",
+                    "description": "分辨率（1：480P（只有seedance2.0可选）\n2：720P\n3：1080P（seedance2.0没有1080P））",
+                    "example": 1
+                  },
+                  "duration": {
+                    "type": "integer",
+                    "description": "时长",
+                    "example": 5
+                  },
+                  "aspect_ratio": {
+                    "type": "integer",
+                    "description": "画面比例（1:【16:9】。2:【9:16】。3:【1:1】。4:【4:3】。5:【3:4】）",
+                    "example": 3
+                  },
+                  "reference_urls": {
+                    "type": "array",
+                    "description": "参考图/视频/音频视频:（仅支持mp4、mov格式，分辨率480P、、720P，时长2~15s(总时长不超过15s)，单视频不超过50MB;\n图片:单图小于30MB(总大小不超过64MB)\n音频:仅支持wav、mp3格式，时长2~15s，单个音频不超过15MB;）\n",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "prompt",
+                  "resolution_option",
+                  "duration",
+                  "aspect_ratio"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskCreatedResponse"
+                },
+                "example": {
+                  "status": 100,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 11,
+                    "status": "Running",
+                    "amount": 100
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "createSeedanceDiscountVideo"
+      }
+    },
+    "/workflow/seedanceDiscountChannel1": {
+      "post": {
+        "summary": "Seedance2.0体验版",
+        "tags": [
+          "视频生成"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "prompt": {
+                    "type": "string",
+                    "description": "提示词",
+                    "example": "",
+                    "default": ""
+                  },
+                  "aspect_ratio": {
+                    "type": "string",
+                    "description": "画面比例（1:【16:9】。2:【9:16】。3:【1:1】）【注意：当模型选择了seedance2.0-满血高清 ，画面比例只能使用16:9和9:16】",
+                    "example": "",
+                    "default": ""
+                  },
+                  "model_option": {
+                    "type": "string",
+                    "description": "模型（1：seedance2.0-fast 2：seedance2.0-满血 3：seedance2.0-满血高清）",
+                    "example": "",
+                    "default": ""
+                  },
+                  "resolution_option": {
+                    "type": "string",
+                    "description": "分辨率（1：480p、2：720p、3：1080p 4:4k）【注意：当模型选择seedance2.0-fast和seedance2.0-满血,分辨率只支持，480p和720p，seedance2.0-满血高清 分辨率支支持，720p、1080p和4k】",
+                    "example": ""
+                  },
+                  "reference_urls": {
+                    "type": "array",
+                    "description": "擦靠素材 【注意：当选择seedance2.0-fast或seedance2.0-满血，参考图片最多上传4张，参考视频最多上传3条，参考音频最多1条；当选择seedance2.0-满血高清，参考图片最多上传9张，参考视频最多上传3条，参考音频最多3条】",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "prompt",
+                  "aspect_ratio",
+                  "model_option",
+                  "resolution_option"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskCreatedResponse"
+                },
+                "example": {
+                  "status": 100,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 11,
+                    "status": "Running",
+                    "amount": 100
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "createSeedanceTrialVideo"
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "/",
+      "description": "当前服务"
+    }
+  ],
+  "security": []
+}
