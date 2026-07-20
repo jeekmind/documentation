@@ -92,7 +92,7 @@
               {
                 "anchor": "开放端 API（新）",
                 "openapi": {
-                  "source": "apidoc/toopen-withoutEnc.json",
+                  "source": "apidoc/toopen-non-enc-pubilc.json",
                   "directory": "open-api-new"
                 }
               }
