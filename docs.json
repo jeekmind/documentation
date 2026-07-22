@@ -76,25 +76,38 @@
             "directory": "card",
             "anchors": [
               {
-                "anchor": "开放端接入",
+                "anchor": "开放 API 接入",
                 "pages": [
                   {
-                    "group": "加密",
+                    "group": "指导",
                     "icon": "lightbulb",
-                    "pages": ["dev/open/connection"]
+                    "pages": ["dev/open/get-bearer-token"]
+                  },
+                  {
+                    "group": "API 参考",
+                    "openapi": {
+                      "source": "apidoc/toopen-new.json",
+                      "directory": "openapi-ref"
+                    }
                   }
                 ]
               },
               {
-                "anchor": "开放端 API 文档",
-                "openapi": "apidoc/toopen.json"
-              },
-              {
-                "anchor": "开放端 API（新）",
-                "openapi": {
-                  "source": "apidoc/toopen-withoutEnc.json",
-                  "directory": "open-api-new"
-                }
+                "anchor": "加密型 API 接入",
+                "pages": [
+                  {
+                    "group": "指导",
+                    "icon": "lightbulb",
+                    "pages": ["dev/open/connection"]
+                  },
+                  {
+                    "group": "API 参考",
+                    "openapi": {
+                      "source": "apidoc/toopen.json",
+                      "directory": "encrypt-api-ref"
+                    }
+                  }
+                ]
               }
             ]
           }
