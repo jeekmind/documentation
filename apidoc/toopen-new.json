@@ -174,20 +174,41 @@
     {
       "name": "视频生成",
       "description": "AI 视频生成及结果查询接口"
+    },
+    {
+      "name": "视频生成-Seedance2.0体验版"
+    },
+    {
+      "name": "视频生成-Seedance2.0渠道2"
+    },
+    {
+      "name": "视频生成-seedance 2.0-限时折扣（支持人脸）"
+    },
+    {
+      "name": "视频生成-谷歌omni"
+    },
+    {
+      "name": "视频生成-获取生成结果"
+    },
+    {
+      "name": "视频生成-seedance"
+    },
+    {
+      "name": "视频生成-seedance2.0（支持人脸）"
     }
   ],
   "paths": {
     "/workflow/liveAiVideo": {
       "post": {
         "x-mint": {
-          "href": "/openapi-ref/workflow/liveAiVideo",
+          "href": "/openapi-ref/workflow/live-ai-video",
           "metadata": {
             "sidebarTitle": "seedance（支持人脸）"
           }
         },
         "summary": "seedance（支持人脸）",
         "description": "",
-        "tags": ["视频生成"],
+        "tags": ["视频生成-seedance2.0（支持人脸）"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -292,9 +313,15 @@
     },
     "/workflow/seedanceAiVideo": {
       "post": {
+        "x-mint": {
+          "href": "/openapi-ref/workflow/seedance-ai-video",
+          "metadata": {
+            "sidebarTitle": "seedance"
+          }
+        },
         "summary": "seedance",
         "description": "",
-        "tags": ["视频生成"],
+        "tags": ["视频生成-seedance"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -398,9 +425,15 @@
     },
     "/workflow/getResult": {
       "post": {
+        "x-mint": {
+          "href": "/openapi-ref/workflow/get-result",
+          "metadata": {
+            "sidebarTitle": "获取生成结果"
+          }
+        },
         "summary": "获取生成结果",
         "description": "",
-        "tags": ["视频生成"],
+        "tags": ["视频生成-获取生成结果"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -424,7 +457,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/VideoResultResponse"
+                  "$ref": "#/components/schemas/video-result-response"
                 },
                 "example": {
                   "status": 100,
@@ -454,9 +487,15 @@
     },
     "/workflow/aiVideo": {
       "post": {
+        "x-mint": {
+          "href": "/openapi-ref/workflow/ai-video",
+          "metadata": {
+            "sidebarTitle": "谷歌omni"
+          }
+        },
         "summary": "谷歌omni",
         "description": "",
-        "tags": ["视频生成"],
+        "tags": ["视频生成-谷歌omni"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -537,9 +576,15 @@
     },
     "/workflow/seedanceDiscount": {
       "post": {
+        "x-mint": {
+          "href": "/openapi-ref/workflow/seedance-discount",
+          "metadata": {
+            "sidebarTitle": "seedance 2.0-限时折扣（支持人脸）"
+          }
+        },
         "summary": "seedance 2.0-限时折扣（支持人脸）",
         "description": "",
-        "tags": ["视频生成"],
+        "tags": ["视频生成-seedance 2.0-限时折扣（支持人脸）"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -633,9 +678,15 @@
     },
     "/workflow/seedanceDiscountChannel1": {
       "post": {
+        "x-mint": {
+          "href": "/openapi-ref/workflow/seedance-discount-channel1",
+          "metadata": {
+            "sidebarTitle": "Seedance2.0体验版"
+          }
+        },
         "summary": "Seedance2.0体验版",
         "description": "",
-        "tags": ["视频生成"],
+        "tags": ["视频生成-seedance2.0体验版"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -721,9 +772,15 @@
     },
     "/workflow/seedanceDiscountChannel2": {
       "post": {
+        "x-mint": {
+          "href": "/openapi-ref/workflow/seedance-discount-channel2",
+          "metadata": {
+            "sidebarTitle": "Seedance2.0 渠道2"
+          }
+        },
         "summary": "Seedance2.0 渠道2",
         "description": "",
-        "tags": ["视频生成"],
+        "tags": ["视频生成-seedance2.0渠道2"],
         "requestBody": {
           "content": {
             "application/json": {
