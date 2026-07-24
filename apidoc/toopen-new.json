@@ -179,6 +179,12 @@
   "paths": {
     "/workflow/liveAiVideo": {
       "post": {
+        "x-mint": {
+          "href": "/openapi-ref/workflow/liveAiVideo",
+          "metadata": {
+            "sidebarTitle": "seedance（支持人脸）"
+          }
+        },
         "summary": "seedance（支持人脸）",
         "description": "",
         "tags": ["视频生成"],
@@ -727,7 +733,7 @@
                   "prompt": {
                     "type": "string",
                     "description": "提示词",
-                    "example": "生成一段科幻世界的视频",
+                    "example": "全程使用视频1的第一视角构图，全程使用音频1作为背景音乐。第一人称视角果茶宣传广告，seedance牌「苹苹安安」苹果果茶限定款；首帧为图片1，你的手摘下一颗带晨露的阿克苏红苹果，轻脆的苹果碰撞声；2-4 秒：第一人称手持举杯，你将图片2中的果茶举到镜头前（模拟递到观众面前的视角），杯身标签清晰可见，背景音「来一口鲜爽」，尾帧定格为图片2。背景声音统一为女生音色。",
                     "default": ""
                   },
                   "aspect_ratio": {
@@ -738,9 +744,9 @@
                   },
                   "model_option": {
                     "type": "integer",
-                    "description": "模型（1：模型1）",
+                    "description": "模型（1：模型1，2: 模型2）",
                     "example": 1,
-                    "enum": [1]
+                    "enum": [1, 2]
                   },
                   "resolution_option": {
                     "type": "integer",
@@ -750,12 +756,17 @@
                   },
                   "reference_urls": {
                     "type": "array",
-                    "description": "参考素材 URL 列表",
+                    "description": "参考素材 URL 列表，支持9张参考图，3段参考视频，3段参考音频",
                     "items": {
                       "type": "string",
                       "format": "uri"
                     },
-                    "example": ["https://example.com/reference.jpg"]
+                    "example": [
+                      "https://ark-project.tos-cn-beijing.volces.com/doc_image/r2v_tea_pic1.jpg",
+                      "https://ark-project.tos-cn-beijing.volces.com/doc_image/r2v_tea_pic2.jpg",
+                      "https://ark-project.tos-cn-beijing.volces.com/doc_audio/r2v_tea_audio1.mp3",
+                      "https://ark-project.tos-cn-beijing.volces.com/doc_video/r2v_tea_video1.mp4"
+                    ]
                   }
                 },
                 "required": [
