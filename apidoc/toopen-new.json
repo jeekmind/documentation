@@ -4,90 +4,9 @@
     "description": "",
     "version": "1.0.0"
   },
-  "openapi": "3.0.0",
+  "openapi": "3.1.0",
   "components": {
     "schemas": {
-      "公告详细信息": {
-        "type": "object",
-        "properties": {
-          "title": {
-            "type": "string",
-            "description": "标题，纯文本"
-          },
-          "pinSort": {
-            "type": "integer",
-            "description": "置顶排序，默认为空，有数字时从大到小排在最前，后续按规则排序",
-            "nullable": true
-          },
-          "content": {
-            "type": "string",
-            "description": "公告内容，HTML 格式"
-          },
-          "status": {
-            "type": "boolean",
-            "description": "状态，已启用，未启用"
-          },
-          "createTime": {
-            "type": "string",
-            "description": "创建时间"
-          },
-          "availableTime": {
-            "type": "string",
-            "description": "发布时间"
-          },
-          "id": {
-            "type": "integer",
-            "description": "公告 ID"
-          }
-        }
-      },
-      "公告列表项": {
-        "type": "object",
-        "properties": {
-          "title": {
-            "type": "string",
-            "description": "标题，纯文本"
-          },
-          "pinSort": {
-            "type": "integer",
-            "description": "置顶排序，默认为空，有数字时从大到小排在最前，后续的规则按规则排序",
-            "nullable": true
-          },
-          "status": {
-            "type": "boolean",
-            "description": "状态，已启用，未启用"
-          },
-          "availableTime": {
-            "type": "string",
-            "description": "发布时间"
-          },
-          "id": {
-            "type": "string",
-            "default": "1",
-            "description": "公告 ID"
-          }
-        }
-      },
-      "响应框架": {
-        "type": "object",
-        "required": ["status", "message", "data"],
-        "properties": {
-          "status": {
-            "type": "integer",
-            "description": "状态码"
-          },
-          "message": {
-            "type": "string",
-            "description": "提示"
-          },
-          "data": {
-            "type": "object",
-            "required": [],
-            "properties": {},
-            "description": "数据体"
-          }
-        }
-      },
       "VideoTaskData": {
         "type": "object",
         "required": ["id", "status", "amount"],
@@ -245,7 +164,7 @@
                     "type": "integer",
                     "description": "渠道（1 渠道一）（1：渠道一）",
                     "example": 1,
-                    "default": 2,
+                    "default": 1,
                     "enum": [1]
                   },
                   "reference_urls": {
@@ -443,7 +362,7 @@
                   "id": {
                     "type": "number",
                     "description": "会话ID",
-                    "example": "1"
+                    "example": 1
                   }
                 },
                 "required": ["id"]
@@ -457,7 +376,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/video-result-response"
+                  "$ref": "#/components/schemas/VideoResultResponse"
                 },
                 "example": {
                   "status": 100,
@@ -525,8 +444,8 @@
                   "resolution_option": {
                     "type": "integer",
                     "description": "分辨率\n2：720P\n3：1080P（2：720p；3：1080p）",
-                    "example": 1,
-                    "default": 1,
+                    "example": 2,
+                    "default": 2,
                     "enum": [2, 3]
                   }
                 },
@@ -703,14 +622,12 @@
                     "type": "integer",
                     "description": "画面比例（1:【16:9】。2:【9:16】。3:【1:1】）【注意：当模型选择了seedance2.0-满血高清 ，画面比例只能使用16:9和9:16】（1：16:9；2：9:16；3：1:1）",
                     "example": 2,
-                    "default": "",
                     "enum": [1, 2, 3]
                   },
                   "model_option": {
                     "type": "integer",
                     "description": "模型（1：seedance2.0-fast 2：seedance2.0-满血 3：seedance2.0-满血高清 4：seedance2.0-卡人脸）（1：seedance2.0-fast；2：seedance2.0-满血；3：seedance2.0-满血高清；4：seedance2.0-卡人脸）",
                     "example": 4,
-                    "default": "",
                     "enum": [1, 2, 3, 4]
                   },
                   "resolution_option": {
@@ -880,5 +797,6 @@
     {
       "BearerAuth": []
     }
-  ]
+  ],
+  "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema"
 }
