@@ -92,23 +92,6 @@
                     }
                   }
                 ]
-              },
-              {
-                "anchor": "加密型 API 接入",
-                "pages": [
-                  {
-                    "group": "指导",
-                    "icon": "lightbulb",
-                    "pages": ["dev/open/connection"]
-                  },
-                  {
-                    "group": "API 参考",
-                    "openapi": {
-                      "source": "apidoc/toopen.json",
-                      "directory": "encrypt-api-ref"
-                    }
-                  }
-                ]
               }
             ]
           }
