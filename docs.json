@@ -21,7 +21,7 @@
     "options": ["chatgpt", "mcp", "view", "copy"]
   },
   "api": {
-    "openapi": "apidoc/toopen.json",
+    "openapi": "apidoc/toopen-new.json",
     "playground": {
       "display": "interactive"
     },
