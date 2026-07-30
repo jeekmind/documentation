@@ -95,40 +95,25 @@
       "description": "AI 视频生成及结果查询接口"
     },
     {
-      "name": "临时储存",
-      "description": "临时文件上传接口"
+      "name": "视频生成-Seedance2.0体验版"
     },
     {
-      "name": "视频生成-Seedance2.0（支持人脸）",
-      "description": "Seedance2.0（支持人脸）相关接口"
+      "name": "视频生成-Seedance2.0渠道2"
     },
     {
-      "name": "视频生成-Seedance 原价",
-      "description": "Seedance 原价相关接口"
+      "name": "视频生成-seedance 2.0-限时折扣（支持人脸）"
     },
     {
-      "name": "视频生成-获取生成结果",
-      "description": "获取生成结果相关接口"
+      "name": "视频生成-谷歌omni"
     },
     {
-      "name": "视频生成-谷歌 Omni",
-      "description": "谷歌 Omni相关接口"
+      "name": "视频生成-获取生成结果"
     },
     {
-      "name": "视频生成-Seedance2.0 限时折扣（支持人脸）",
-      "description": "Seedance2.0 限时折扣（支持人脸）相关接口"
+      "name": "视频生成-seedance"
     },
     {
-      "name": "视频生成-Seedance2.0 体验1",
-      "description": "Seedance2.0 体验1相关接口"
-    },
-    {
-      "name": "视频生成-Seedance2.0 体验2",
-      "description": "Seedance2.0 体验2相关接口"
-    },
-    {
-      "name": "视频生成-Seedance2.0 体验3",
-      "description": "Seedance2.0 体验3相关接口"
+      "name": "视频生成-seedance2.0（支持人脸）"
     }
   ],
   "paths": {
@@ -161,34 +146,13 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["status", "message", "data"],
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "example": 100
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "操作成功"
-                    },
-                    "data": {
-                      "type": "object",
-                      "required": ["full_url"],
-                      "properties": {
-                        "full_url": {
-                          "type": "string",
-                          "format": "uri",
-                          "example": ".../1785314758_65f4ec.mp4"
-                        }
-                      }
-                    }
-                  }
+                  "properties": {}
                 },
                 "example": {
                   "status": 100,
                   "message": "操作成功",
                   "data": {
-                    "full_url": ".../1785314758_65f4ec.mp4"
+                    "full_url": "open251124.ai.jko.cc/1785314758_65f4ec.mp4"
                   }
                 }
               }
@@ -201,12 +165,12 @@
                 "schema": {
                   "type": "object",
                   "properties": {}
-                }
+                },
+                "example": ""
               }
             }
           }
-        },
-        "operationId": "uploadTemporaryFile"
+        }
       }
     },
     "/workflow/liveAiVideo": {
@@ -214,12 +178,12 @@
         "x-mint": {
           "href": "/openapi-ref/workflow/live-ai-video",
           "metadata": {
-            "sidebarTitle": "Seedance（支持人脸）"
+            "sidebarTitle": "seedance（支持人脸）"
           }
         },
-        "summary": "Seedance（支持人脸）",
+        "summary": "seedance（支持人脸）",
         "description": "",
-        "tags": ["视频生成-Seedance2.0（支持人脸）"],
+        "tags": ["视频生成-seedance2.0（支持人脸）"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -319,8 +283,7 @@
               }
             }
           }
-        },
-        "operationId": "createLiveAiVideo"
+        }
       }
     },
     "/workflow/seedanceAiVideo": {
@@ -328,12 +291,12 @@
         "x-mint": {
           "href": "/openapi-ref/workflow/seedance-ai-video",
           "metadata": {
-            "sidebarTitle": "Seedance 原价"
+            "sidebarTitle": "seedance"
           }
         },
-        "summary": "Seedance 原价",
+        "summary": "seedance",
         "description": "",
-        "tags": ["视频生成-Seedance 原价"],
+        "tags": ["视频生成-seedance"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -432,8 +395,7 @@
               }
             }
           }
-        },
-        "operationId": "createSeedanceAiVideo"
+        }
       }
     },
     "/workflow/getResult": {
@@ -495,8 +457,7 @@
               }
             }
           }
-        },
-        "operationId": "getVideoResult"
+        }
       }
     },
     "/workflow/aiVideo": {
@@ -504,12 +465,12 @@
         "x-mint": {
           "href": "/openapi-ref/workflow/ai-video",
           "metadata": {
-            "sidebarTitle": "谷歌 Omni"
+            "sidebarTitle": "谷歌omni"
           }
         },
-        "summary": "谷歌 Omni",
+        "summary": "谷歌omni",
         "description": "",
-        "tags": ["视频生成-谷歌 Omni"],
+        "tags": ["视频生成-谷歌omni"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -585,8 +546,7 @@
               }
             }
           }
-        },
-        "operationId": "createOmniVideo"
+        }
       }
     },
     "/workflow/seedanceDiscount": {
@@ -594,12 +554,12 @@
         "x-mint": {
           "href": "/openapi-ref/workflow/seedance-discount",
           "metadata": {
-            "sidebarTitle": "Seedance2.0 限时折扣（支持人脸）"
+            "sidebarTitle": "seedance 2.0-限时折扣（支持人脸）"
           }
         },
-        "summary": "Seedance2.0 限时折扣（支持人脸）",
+        "summary": "seedance 2.0-限时折扣（支持人脸）",
         "description": "",
-        "tags": ["视频生成-Seedance2.0 限时折扣（支持人脸）"],
+        "tags": ["视频生成-seedance 2.0-限时折扣（支持人脸）"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -688,8 +648,7 @@
               }
             }
           }
-        },
-        "operationId": "createSeedanceDiscountVideo"
+        }
       }
     },
     "/workflow/seedanceDiscountChannel1": {
@@ -697,12 +656,12 @@
         "x-mint": {
           "href": "/openapi-ref/workflow/seedance-discount-channel1",
           "metadata": {
-            "sidebarTitle": "Seedance2.0 体验1"
+            "sidebarTitle": "Seedance2.0体验版"
           }
         },
-        "summary": "Seedance2.0 体验1",
+        "summary": "Seedance2.0体验版",
         "description": "",
-        "tags": ["视频生成-Seedance2.0 体验1"],
+        "tags": ["视频生成-seedance2.0体验版"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -717,37 +676,25 @@
                   },
                   "aspect_ratio": {
                     "type": "integer",
-                    "description": "画面比例（1：16:9；2：9:16；3：1:1）。当前模型仅支持 16:9 和 9:16。",
+                    "description": "画面比例（1:【16:9】。2:【9:16】。3:【1:1】）【注意：当模型选择了seedance2.0-满血高清 ，画面比例只能使用16:9和9:16】（1：16:9；2：9:16；3：1:1）",
                     "example": 2,
                     "enum": [1, 2, 3]
                   },
                   "model_option": {
                     "type": "integer",
-                    "description": "模型（4：满血-不支持人脸-9图0视频0音频）",
+                    "description": "模型（1：seedance2.0-fast 2：seedance2.0-满血 3：seedance2.0-满血高清 4：seedance2.0-卡人脸）（1：seedance2.0-fast；2：seedance2.0-满血；3：seedance2.0-满血高清；4：seedance2.0-卡人脸）",
                     "example": 4,
-                    "enum": [4]
+                    "enum": [1, 2, 3, 4]
                   },
                   "resolution_option": {
                     "type": "integer",
-                    "description": "分辨率（2：720p）。当前模型仅支持 720p。",
+                    "description": "分辨率（1：480p、2：720p、3：1080p 4:4k）【注意：当模型选择seedance2.0-fast和seedance2.0-满血,分辨率只支持，480p和720p，seedance2.0-满血高清 分辨率支支持，720p、1080p和4k】（1：480p；2：720p；3：1080p；4：4K）",
                     "example": 2,
-                    "enum": [2]
-                  },
-                  "reference_urls": {
-                    "type": "array",
-                    "description": "参考素材 URL 列表；1. 当选择《满血-不支持人脸-9图0视频0音频》，支持9参考图、3参考视频、3参考视频",
-                    "items": {
-                      "type": "string",
-                      "format": "uri"
-                    },
-                    "example": [
-                      "https://ark-project.tos-cn-beijing.volces.com/doc_image/r2v_tea_pic1.jpg",
-                      "https://ark-project.tos-cn-beijing.volces.com/doc_image/r2v_tea_pic2.jpg"
-                    ]
+                    "enum": [1, 2, 3, 4]
                   },
                   "duration": {
                     "type": "integer",
-                    "description": "生成视频时长（秒）",
+                    "description": "",
                     "example": 15
                   }
                 },
@@ -793,8 +740,7 @@
               }
             }
           }
-        },
-        "operationId": "createSeedanceExperience1Video"
+        }
       }
     },
     "/workflow/seedanceDiscountChannel2": {
@@ -802,12 +748,12 @@
         "x-mint": {
           "href": "/openapi-ref/workflow/seedance-discount-channel2",
           "metadata": {
-            "sidebarTitle": "Seedance2.0 体验2"
+            "sidebarTitle": "Seedance2.0 渠道2"
           }
         },
-        "summary": "Seedance2.0 体验2",
+        "summary": "Seedance2.0 渠道2",
         "description": "",
-        "tags": ["视频生成-Seedance2.0 体验2"],
+        "tags": ["视频生成-seedance2.0渠道2"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -828,7 +774,7 @@
                   },
                   "model_option": {
                     "type": "integer",
-                    "description": "模型（1：满血-支持人脸-9图3视频3音频；2：稳定-满血-支持人脸-9图3视频3音频）",
+                    "description": "模型（1：模型1，2: 模型2）",
                     "example": 1,
                     "enum": [1, 2]
                   },
@@ -840,7 +786,7 @@
                   },
                   "reference_urls": {
                     "type": "array",
-                    "description": "参考素材 URL 列表；两个模型均支持最多 9 张参考图、3 段参考视频和 3 段参考音频。",
+                    "description": "参考素材 URL 列表，支持9张参考图，3段参考视频，3段参考音频",
                     "items": {
                       "type": "string",
                       "format": "uri"
@@ -851,21 +797,13 @@
                       "https://ark-project.tos-cn-beijing.volces.com/doc_audio/r2v_tea_audio1.mp3",
                       "https://ark-project.tos-cn-beijing.volces.com/doc_video/r2v_tea_video1.mp4"
                     ]
-                  },
-                  "duration": {
-                    "type": "integer",
-                    "description": "生成视频时长（4–15 秒）",
-                    "minimum": 4,
-                    "maximum": 15,
-                    "example": 15
                   }
                 },
                 "required": [
                   "prompt",
                   "aspect_ratio",
                   "model_option",
-                  "resolution_option",
-                  "duration"
+                  "resolution_option"
                 ]
               }
             }
@@ -902,117 +840,7 @@
               }
             }
           }
-        },
-        "operationId": "createSeedanceExperience2Video"
-      }
-    },
-    "/workflow/seedanceDiscountChannel3": {
-      "post": {
-        "x-mint": {
-          "href": "/openapi-ref/workflow/seedance-discount-channel3",
-          "metadata": {
-            "sidebarTitle": "Seedance2.0 体验3"
-          }
-        },
-        "summary": "Seedance2.0 体验3",
-        "description": "",
-        "tags": ["视频生成-Seedance2.0 体验3"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "prompt": {
-                    "type": "string",
-                    "description": "提示词",
-                    "example": "全程使用视频1的第一视角构图，全程使用音频1作为背景音乐。第一人称视角果茶宣传广告，seedance牌「苹苹安安」苹果果茶限定款；首帧为图片1，你的手摘下一颗带晨露的阿克苏红苹果，轻脆的苹果碰撞声；2-4 秒：第一人称手持举杯，你将图片2中的果茶举到镜头前（模拟递到观众面前的视角），杯身标签清晰可见，背景音「来一口鲜爽」，尾帧定格为图片2。背景声音统一为女生音色。",
-                    "default": ""
-                  },
-                  "aspect_ratio": {
-                    "type": "integer",
-                    "description": "画面比例（1：16:9；2：9:16；3：1:1；4：3:4；5：4:3）",
-                    "example": 2,
-                    "enum": [1, 2, 3, 4, 5]
-                  },
-                  "model_option": {
-                    "type": "integer",
-                    "description": "模型（1：满血-支持人脸-933-720p；2：满血-不支持人脸-900-720p；3：满血-支持人脸-903-1080p）",
-                    "example": 1,
-                    "enum": [1, 2, 3]
-                  },
-                  "resolution_option": {
-                    "type": "integer",
-                    "description": "分辨率（2：720p；3：1080p）",
-                    "example": 2,
-                    "enum": [2, 3]
-                  },
-                  "duration": {
-                    "type": "integer",
-                    "description": "生成视频时长（4–15 秒）",
-                    "minimum": 4,
-                    "maximum": 15,
-                    "example": 15
-                  },
-                  "reference_urls": {
-                    "type": "array",
-                    "description": "参考素材 URL 列表。模型1支持最多9张参考图、3段参考视频、3段参考音频；模型2支持最多9张参考图；模型3支持最多9张参考图、3段参考音频。",
-                    "items": {
-                      "type": "string",
-                      "format": "uri"
-                    },
-                    "example": [
-                      "https://ark-project.tos-cn-beijing.volces.com/doc_image/r2v_tea_pic1.jpg",
-                      "https://ark-project.tos-cn-beijing.volces.com/doc_image/r2v_tea_pic2.jpg",
-                      "https://ark-project.tos-cn-beijing.volces.com/doc_audio/r2v_tea_audio1.mp3",
-                      "https://ark-project.tos-cn-beijing.volces.com/doc_video/r2v_tea_video1.mp4"
-                    ]
-                  }
-                },
-                "required": [
-                  "prompt",
-                  "aspect_ratio",
-                  "model_option",
-                  "resolution_option",
-                  "duration"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VideoTaskResponse"
-                },
-                "example": {
-                  "status": 100,
-                  "message": "操作成功",
-                  "data": {
-                    "id": 11,
-                    "status": "Running",
-                    "amount": 100
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "失败",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {}
-                }
-              }
-            }
-          }
-        },
-        "operationId": "createSeedanceExperience3Video"
+        }
       }
     }
   },
