@@ -13,15 +13,18 @@
         "properties": {
           "id": {
             "type": "integer",
+            "description": "任务的 ID 记录。",
             "example": 11
           },
           "status": {
             "type": "string",
             "enum": ["Running", "Success", "Failed"],
+            "description": "任务状态。",
             "example": "Running"
           },
           "amount": {
             "type": "number",
+            "description": "任务所消耗的算力。",
             "example": 100
           }
         }
@@ -32,10 +35,12 @@
         "properties": {
           "status": {
             "type": "integer",
+            "description": "状态码，100 表示成功，其他表示失败。",
             "example": 100
           },
           "message": {
             "type": "string",
+            "description": "操作结果的提示消息。",
             "example": "操作成功"
           },
           "data": {
@@ -49,16 +54,19 @@
         "properties": {
           "id": {
             "type": "integer",
+            "description": "任务的 ID 记录。",
             "example": 20
           },
           "status": {
             "type": "string",
             "enum": ["Running", "Success", "Failed"],
+            "description": "任务的状态。\nRunning 表示正在运行，\nSuccess 表示成功，\nFailed 表示失败。",
             "example": "Success"
           },
           "response_json": {
-            "type": "string",
-            "example": "Example content."
+            "type": "object",
+            "description": "执行结果内容。",
+            "example": "# AD钙奶产品市场调研报告\n\n## 一、品牌背..."
           }
         }
       },
@@ -68,10 +76,12 @@
         "properties": {
           "status": {
             "type": "integer",
+            "description": "响应状态码。",
             "example": 100
           },
           "message": {
             "type": "string",
+            "description": "响应消息。",
             "example": "操作成功"
           },
           "data": {
@@ -134,8 +144,15 @@
   "paths": {
     "/upload": {
       "post": {
-        "summary": "上传文件（参考图偏/参考视频/参考音频）只保存3小时",
-        "description": "",
+        "summary": "上传文件",
+        "description": "支持上传：图片、视频与音频，只保存3小时。",
+        "x-mint": {
+          "href": "/openapi-ref/upload",
+          "content": "<Warning>上传后，文件只会保留 3 小时。</Warning>",
+          "metadata": {
+            "sidebarTitle": "上传文件"
+          }
+        },
         "tags": ["临时储存"],
         "requestBody": {
           "content": {
