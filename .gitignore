@@ -1,3 +1,4 @@
 .DS_Store
 .pnpm-store/v11/
 apidoc/toopen-non-encrypted-private-list.json
+tmp/

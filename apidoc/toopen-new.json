@@ -226,233 +226,6 @@
         "operationId": "uploadTemporaryFile"
       }
     },
-    "/workflow/liveAiVideo": {
-      "post": {
-        "x-mint": {
-          "href": "/openapi-ref/workflow/live-ai-video",
-          "metadata": {
-            "sidebarTitle": "Seedance（支持人脸）"
-          }
-        },
-        "summary": "Seedance（支持人脸）",
-        "description": "",
-        "tags": ["视频生成-Seedance2.0（支持人脸）"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "prompt": {
-                    "type": "string",
-                    "description": "文本提示词",
-                    "example": "景别：中景\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\n表演/动作：先回头微笑，再自然挥手。\n镜头建议：镜头稳定，中景构图保留建筑背景。",
-                    "default": "景别：中景\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\n表演/动作：先回头微笑，再自然挥手。\n镜头建议：镜头稳定，中景构图保留建筑背景。"
-                  },
-                  "resolution_option": {
-                    "type": "integer",
-                    "description": "分辨率（1：480P（只有seedance2.0可选）\n2：720P\n3：1080P（seedance2.0没有1080P））（1：480p；2：720p；3：1080p）",
-                    "example": 1,
-                    "default": 1,
-                    "enum": [1, 2, 3]
-                  },
-                  "duration": {
-                    "type": "integer",
-                    "description": "时长",
-                    "example": 5,
-                    "default": 5
-                  },
-                  "aspect_ratio": {
-                    "type": "integer",
-                    "description": "画面比例（1:【16:9】。2:【9:16】。3:【1:1】。4:【4:3】。5:【3:4】）（1：16:9；2：9:16；3：1:1；4：4:3；5：3:4）",
-                    "example": 3,
-                    "default": 3,
-                    "enum": [1, 2, 3, 4, 5]
-                  },
-                  "channel_option": {
-                    "type": "integer",
-                    "description": "渠道（1 渠道一）（1：渠道一）",
-                    "example": 1,
-                    "default": 1,
-                    "enum": [1]
-                  },
-                  "reference_urls": {
-                    "type": "array",
-                    "description": "参考图/视频/音频视频:（仅支持mp4、mov格式，分辨率480P、、720P，时长2~15s(总时长不超过15s)，单视频不超过50MB;\n图片:单图小于30MB(总大小不超过64MB)\n音频:仅支持wav、mp3格式，时长2~15s，单个音频不超过15MB;）",
-                    "items": {
-                      "oneOf": [
-                        {
-                          "type": "integer",
-                          "description": "素材库资源 ID"
-                        },
-                        {
-                          "type": "string",
-                          "format": "uri",
-                          "description": "资源 URL"
-                        }
-                      ]
-                    }
-                  }
-                },
-                "required": [
-                  "prompt",
-                  "resolution_option",
-                  "duration",
-                  "aspect_ratio",
-                  "channel_option"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VideoTaskResponse"
-                },
-                "example": {
-                  "status": 100,
-                  "message": "操作成功",
-                  "data": {
-                    "id": 11,
-                    "status": "Running",
-                    "amount": 100
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "失败",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {}
-                }
-              }
-            }
-          }
-        },
-        "operationId": "createLiveAiVideo"
-      }
-    },
-    "/workflow/seedanceAiVideo": {
-      "post": {
-        "x-mint": {
-          "href": "/openapi-ref/workflow/seedance-ai-video",
-          "metadata": {
-            "sidebarTitle": "Seedance 原价"
-          }
-        },
-        "summary": "Seedance 原价",
-        "description": "",
-        "tags": ["视频生成-Seedance 原价"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "prompt": {
-                    "type": "string"
-                  },
-                  "resolution_option": {
-                    "type": "integer",
-                    "enum": [1, 2, 3],
-                    "description": "可选值（1：480p；2：720p；3：1080p）"
-                  },
-                  "duration": {
-                    "type": "integer"
-                  },
-                  "aspect_ratio": {
-                    "type": "integer",
-                    "enum": [1, 2, 3, 4, 5],
-                    "description": "可选值（1：16:9；2：9:16；3：1:1；4：4:3；5：3:4）"
-                  },
-                  "reference_urls": {
-                    "type": "array",
-                    "items": {
-                      "oneOf": [
-                        {
-                          "type": "integer",
-                          "description": "素材库资源 ID"
-                        },
-                        {
-                          "type": "string",
-                          "format": "uri",
-                          "description": "资源 URL"
-                        }
-                      ]
-                    }
-                  },
-                  "channel_option": {
-                    "type": "integer",
-                    "enum": [1],
-                    "description": "可选值（1：渠道一）"
-                  }
-                },
-                "required": [
-                  "prompt",
-                  "resolution_option",
-                  "duration",
-                  "aspect_ratio",
-                  "reference_urls",
-                  "channel_option"
-                ]
-              },
-              "example": {
-                "prompt": "景别：中景\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\n表演/动作：先回头微笑，再自然挥手。\n镜头建议：镜头稳定，中景构图保留建筑背景。",
-                "resolution_option": 1,
-                "duration": 5,
-                "aspect_ratio": 3,
-                "reference_urls": [
-                  17,
-                  "https://p3-bot-workflow-sign.byteimg.com/tos-cn-i-mdko3gqilj/db4da158ef7b49369ad258ba25b47dc2.jpg~tplv-mdko3gqilj-image.image?rk3s=81d4c505&x-expires=1808445522&x-signature=vdujF9FoBAwSe88%2Fv5uc4eXbCQU%3D&x-wf-file_name=20260428-095824.jpg"
-                ],
-                "channel_option": 1
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VideoTaskResponse"
-                },
-                "example": {
-                  "status": 100,
-                  "message": "操作成功",
-                  "data": {
-                    "id": 11,
-                    "status": "Running",
-                    "amount": 100
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "失败",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {}
-                }
-              }
-            }
-          }
-        },
-        "operationId": "createSeedanceAiVideo"
-      }
-    },
     "/workflow/getResult": {
       "post": {
         "x-mint": {
@@ -516,199 +289,6 @@
         "operationId": "getVideoResult"
       }
     },
-    "/workflow/aiVideo": {
-      "post": {
-        "x-mint": {
-          "href": "/openapi-ref/workflow/ai-video",
-          "metadata": {
-            "sidebarTitle": "谷歌 Omni"
-          }
-        },
-        "summary": "谷歌 Omni",
-        "description": "",
-        "tags": ["视频生成-谷歌 Omni"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "prompt": {
-                    "type": "string",
-                    "description": "文本提示词",
-                    "example": "景别：中景\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\n表演/动作：先回头微笑，再自然挥手。\n镜头建议：镜头稳定，中景构图保留建筑背景。",
-                    "default": "景别：中景\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\n表演/动作：先回头微笑，再自然挥手。\n镜头建议：镜头稳定，中景构图保留建筑背景。"
-                  },
-                  "aspect_ratio": {
-                    "type": "integer",
-                    "description": "画面比例（1:【16:9】。2:【9:16】。3:【1:1】。4:【4:3】。5:【3:4】）（1：16:9；2：9:16；3：1:1；4：4:3；5：3:4）",
-                    "example": 3,
-                    "default": 3,
-                    "enum": [1, 2, 3, 4, 5]
-                  },
-                  "duration": {
-                    "type": "integer",
-                    "description": "需要生产视频的时长（最多10秒）",
-                    "example": 5,
-                    "minimum": 1,
-                    "maximum": 10
-                  },
-                  "resolution_option": {
-                    "type": "integer",
-                    "description": "分辨率\n2：720P\n3：1080P（2：720p；3：1080p）",
-                    "example": 2,
-                    "default": 2,
-                    "enum": [2, 3]
-                  }
-                },
-                "required": [
-                  "prompt",
-                  "aspect_ratio",
-                  "duration",
-                  "resolution_option"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VideoTaskResponse"
-                },
-                "example": {
-                  "status": 100,
-                  "message": "操作成功",
-                  "data": {
-                    "id": 11,
-                    "status": "Running",
-                    "amount": 100
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "失败",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {}
-                }
-              }
-            }
-          }
-        },
-        "operationId": "createOmniVideo"
-      }
-    },
-    "/workflow/seedanceDiscount": {
-      "post": {
-        "x-mint": {
-          "href": "/openapi-ref/workflow/seedance-discount",
-          "metadata": {
-            "sidebarTitle": "Seedance2.0 限时折扣（支持人脸）"
-          }
-        },
-        "summary": "Seedance2.0 限时折扣（支持人脸）",
-        "description": "",
-        "tags": ["视频生成-Seedance2.0 限时折扣（支持人脸）"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "prompt": {
-                    "type": "string",
-                    "description": "文本提示词",
-                    "example": "景别：中景\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\n表演/动作：先回头微笑，再自然挥手。\n镜头建议：镜头稳定，中景构图保留建筑背景。",
-                    "default": "景别：中景\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\n表演/动作：先回头微笑，再自然挥手。\n镜头建议：镜头稳定，中景构图保留建筑背景。"
-                  },
-                  "resolution_option": {
-                    "type": "integer",
-                    "description": "分辨率（1：480P（只有seedance2.0可选）\n2：720P\n3：1080P（seedance2.0没有1080P））（1：480p；2：720p；3：1080p）",
-                    "example": 1,
-                    "enum": [1, 2, 3]
-                  },
-                  "duration": {
-                    "type": "integer",
-                    "description": "时长",
-                    "example": 5
-                  },
-                  "aspect_ratio": {
-                    "type": "integer",
-                    "description": "画面比例（1:【16:9】。2:【9:16】。3:【1:1】。4:【4:3】。5:【3:4】）（1：16:9；2：9:16；3：1:1；4：4:3；5：3:4）",
-                    "example": 3,
-                    "enum": [1, 2, 3, 4, 5]
-                  },
-                  "reference_urls": {
-                    "type": "array",
-                    "description": "参考图/视频/音频视频:（仅支持mp4、mov格式，分辨率480P、、720P，时长2~15s(总时长不超过15s)，单视频不超过50MB;\n图片:单图小于30MB(总大小不超过64MB)\n音频:仅支持wav、mp3格式，时长2~15s，单个音频不超过15MB;）",
-                    "items": {
-                      "oneOf": [
-                        {
-                          "type": "integer",
-                          "description": "素材库资源 ID"
-                        },
-                        {
-                          "type": "string",
-                          "format": "uri",
-                          "description": "资源 URL"
-                        }
-                      ]
-                    }
-                  }
-                },
-                "required": [
-                  "prompt",
-                  "resolution_option",
-                  "duration",
-                  "aspect_ratio"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VideoTaskResponse"
-                },
-                "example": {
-                  "status": 100,
-                  "message": "操作成功",
-                  "data": {
-                    "id": 11,
-                    "status": "Running",
-                    "amount": 100
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "失败",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {}
-                }
-              }
-            }
-          }
-        },
-        "operationId": "createSeedanceDiscountVideo"
-      }
-    },
     "/workflow/seedanceDiscountChannel1": {
       "post": {
         "x-mint": {
@@ -734,25 +314,25 @@
                   },
                   "aspect_ratio": {
                     "type": "integer",
-                    "description": "画面比例（1：16:9；2：9:16；3：1:1）。当前模型仅支持 16:9 和 9:16。",
+                    "description": "画面比例\n1:【16:9】\n2:【9:16】\n3:【1:1】\n【注意：当模型选择了《满血-不支持人脸-9图0视频0音频》 ，画面比例只能使用16:9和9:16】",
                     "example": 2,
                     "enum": [1, 2, 3]
                   },
                   "model_option": {
                     "type": "integer",
-                    "description": "模型（4：满血-不支持人脸-9图0视频0音频）",
+                    "description": "模型\n4：满血-不支持人脸-9 图 0 视频 0 音频",
                     "example": 4,
                     "enum": [4]
                   },
                   "resolution_option": {
                     "type": "integer",
-                    "description": "分辨率（2：720p）。当前模型仅支持 720p。",
+                    "description": "分辨率\n1：代表 480p\n2：代表 720p\n3：代表 1080p\n4：代表 4k\n【注意：当模型选择《满血-不支持人脸-9 图 0 视频 0 音频》只支持 720p】",
                     "example": 2,
                     "enum": [2]
                   },
                   "reference_urls": {
                     "type": "array",
-                    "description": "参考素材 URL 列表；1. 当选择《满血-不支持人脸-9图0视频0音频》，支持9参考图、3参考视频、3参考视频",
+                    "description": "参考素材\n1. 当选择《满血-不支持人脸-9图0视频0音频》，支持 9 参考图、3 参考视频、3 参考音频",
                     "items": {
                       "type": "string",
                       "format": "uri"
@@ -798,17 +378,6 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "失败",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {}
-                }
-              }
-            }
           }
         },
         "operationId": "createSeedanceExperience1Video"
@@ -839,25 +408,25 @@
                   },
                   "aspect_ratio": {
                     "type": "integer",
-                    "description": "画面比例（1：16:9；2：9:16；3：1:1；4：3:4）",
+                    "description": "画面比例\n1:【16:9】\n2:【9:16】\n3:【1:1】\n4:【3:4】",
                     "example": 2,
                     "enum": [1, 2, 3, 4]
                   },
                   "model_option": {
                     "type": "integer",
-                    "description": "模型（1：满血-支持人脸-9图3视频3音频；2：稳定-满血-支持人脸-9图3视频3音频）",
+                    "description": "模型选择\n1：满血-支持人脸-9 图 3 视频 3 音频\n2: 稳定-满血-支持人脸-9 图 3 视频 3 音频",
                     "example": 1,
                     "enum": [1, 2]
                   },
                   "resolution_option": {
                     "type": "integer",
-                    "description": "分辨率（2：720p）",
+                    "description": "分辨率\n2：代表720p",
                     "example": 2,
                     "enum": [2]
                   },
                   "reference_urls": {
                     "type": "array",
-                    "description": "参考素材 URL 列表；两个模型均支持最多 9 张参考图、3 段参考视频和 3 段参考音频。",
+                    "description": "参考素材\n1. 模型《满血-支持人脸-9图3视频3音频》：支持 9 参考图、3 参考视频、3 参考音频。\n2. 模型《稳定-满血-支持人脸-9图3视频3音频》：支持 9 参考图、3 参考视频、3 参考音频。",
                     "items": {
                       "type": "string",
                       "format": "uri"
@@ -907,17 +476,6 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "失败",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {}
-                }
-              }
-            }
           }
         },
         "operationId": "createSeedanceExperience2Video"
@@ -948,19 +506,19 @@
                   },
                   "aspect_ratio": {
                     "type": "integer",
-                    "description": "画面比例（1：16:9；2：9:16；3：1:1；4：3:4；5：4:3）",
+                    "description": "画面比例\n1:【16:9】\n2:【9:16】\n3:【1:1】\n4:【3:4】\n5:【4:3】",
                     "example": 2,
                     "enum": [1, 2, 3, 4, 5]
                   },
                   "model_option": {
                     "type": "integer",
-                    "description": "模型（1：满血-支持人脸-933-720p；2：满血-不支持人脸-900-720p；3：满血-支持人脸-903-1080p）",
+                    "description": "模型选择\n1：满血-支持人脸-9 图 3 视频 3 音频-720p\n2：满血-不支持人脸-9 图 0 视频 0 音频-720p\n3：满血-支持人脸-9 图 0 视频 3 音频-1080p",
                     "example": 1,
                     "enum": [1, 2, 3]
                   },
                   "resolution_option": {
                     "type": "integer",
-                    "description": "分辨率（2：720p；3：1080p）",
+                    "description": "分辨率\n2:【720p】\n3:【1080p】",
                     "example": 2,
                     "enum": [2, 3]
                   },
@@ -973,7 +531,7 @@
                   },
                   "reference_urls": {
                     "type": "array",
-                    "description": "参考素材 URL 列表。模型1支持最多9张参考图、3段参考视频、3段参考音频；模型2支持最多9张参考图；模型3支持最多9张参考图、3段参考音频。",
+                    "description": "参考素材\n1. 模型《满血-支持人脸-9图3视频3音频-720p 》：支持 9 参考图、3 参考视频、3 参考音频。\n2. 模型《满血-不支持人脸-9图0视频0音频-720p》：支持 9 参考图、0 参考视频、0 参考音频。\n3. 模型《满血-支持人脸-9图0视频3音频-1080p》：支持 9 参考图、0 参考视频、3 参考音频",
                     "items": {
                       "type": "string",
                       "format": "uri"
@@ -1030,6 +588,394 @@
           }
         },
         "operationId": "createSeedanceExperience3Video"
+      }
+    },
+    "/workflow/seedanceDiscount": {
+      "post": {
+        "x-mint": {
+          "href": "/openapi-ref/workflow/seedance-discount",
+          "metadata": {
+            "sidebarTitle": "Seedance2.0 限时折扣（支持人脸）"
+          }
+        },
+        "summary": "Seedance2.0 限时折扣（支持人脸）",
+        "description": "",
+        "tags": ["视频生成-Seedance2.0 限时折扣（支持人脸）"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "prompt": {
+                    "type": "string",
+                    "description": "文本提示词",
+                    "example": "景别：中景\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\n表演/动作：先回头微笑，再自然挥手。\n镜头建议：镜头稳定，中景构图保留建筑背景。",
+                    "default": "景别：中景\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\n表演/动作：先回头微笑，再自然挥手。\n镜头建议：镜头稳定，中景构图保留建筑背景。"
+                  },
+                  "resolution_option": {
+                    "type": "integer",
+                    "description": "分辨率\n1：代表 480P\n2：代表 720P\n3：代表 1080P",
+                    "example": 1,
+                    "enum": [1, 2, 3]
+                  },
+                  "duration": {
+                    "type": "integer",
+                    "description": "时长",
+                    "example": 5
+                  },
+                  "aspect_ratio": {
+                    "type": "integer",
+                    "description": "画面比例\n1：代表【16:9】\n2：代表【9:16】\n3：代表【1:1】\n4：代表【4:3】\n5：代表【3:4】",
+                    "example": 3,
+                    "enum": [1, 2, 3, 4, 5]
+                  },
+                  "reference_urls": {
+                    "type": "array",
+                    "description": "参考图/视频/音频\n\n支持9参考图、3参考视频、3参考音频。\n\n视频：仅支持mp4、mov格式，分辨率480P、720P，时长2~15s，单视频不超过50MB;\n图片：单图小于30MB(总大小不超过64MB)\n音频：仅支持wav、mp3格式，时长2~15s，单个音频不超过15MB;",
+                    "items": {
+                      "oneOf": [
+                        {
+                          "type": "integer",
+                          "description": "素材库资源 ID，字符类型必须是整形。"
+                        },
+                        {
+                          "type": "string",
+                          "format": "uri",
+                          "description": "资源 URL"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "prompt",
+                  "resolution_option",
+                  "duration",
+                  "aspect_ratio"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoTaskResponse"
+                },
+                "example": {
+                  "status": 100,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 11,
+                    "status": "Running",
+                    "amount": 100
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "createSeedanceDiscountVideo"
+      }
+    },
+    "/workflow/liveAiVideo": {
+      "post": {
+        "x-mint": {
+          "href": "/openapi-ref/workflow/live-ai-video",
+          "metadata": {
+            "sidebarTitle": "Seedance（支持人脸）"
+          }
+        },
+        "summary": "Seedance（支持人脸）",
+        "description": "",
+        "tags": ["视频生成-Seedance2.0（支持人脸）"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "prompt": {
+                    "type": "string",
+                    "description": "文本提示词",
+                    "example": "景别：中景\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\n表演/动作：先回头微笑，再自然挥手。\n镜头建议：镜头稳定，中景构图保留建筑背景。",
+                    "default": "景别：中景\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\n表演/动作：先回头微笑，再自然挥手。\n镜头建议：镜头稳定，中景构图保留建筑背景。"
+                  },
+                  "resolution_option": {
+                    "type": "integer",
+                    "description": "分辨率\n1：480P（支持模型：全部模型）\n2：720P（支持模型：全部模型）\n3：1080P（支持模型：真人版-视频生成）",
+                    "example": 1,
+                    "default": 1,
+                    "enum": [1, 2, 3]
+                  },
+                  "duration": {
+                    "type": "integer",
+                    "description": "时长",
+                    "example": 5,
+                    "default": 5
+                  },
+                  "aspect_ratio": {
+                    "type": "integer",
+                    "description": "画面比例\n1:【16:9】\n2:【9:16】\n3:【1:1】\n4:【4:3】\n5:【3:4】",
+                    "example": 3,
+                    "default": 3,
+                    "enum": [1, 2, 3, 4, 5]
+                  },
+                  "channel_option": {
+                    "type": "integer",
+                    "description": "渠道\n1：真人版-视频生成\n2：真人版-视频生成-fast\n3：真人版-视频生成-mini",
+                    "example": 1,
+                    "default": 1,
+                    "enum": [1, 2, 3]
+                  },
+                  "reference_urls": {
+                    "type": "array",
+                    "description": "参考图/视频/音频视频:（仅支持mp4、mov格式，分辨率480P、、720P，时长2-15s(总时长不超过15s)，单视频不超过50MB;\n图片:单图小于30MB(总大小不超过64MB)\n音频:仅支持wav、mp3格式，时长2-15s，单个音频不超过15MB;）",
+                    "items": {
+                      "oneOf": [
+                        {
+                          "type": "integer",
+                          "description": "素材库资源 ID"
+                        },
+                        {
+                          "type": "string",
+                          "format": "uri",
+                          "description": "资源 URL"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "prompt",
+                  "resolution_option",
+                  "duration",
+                  "aspect_ratio",
+                  "channel_option"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoTaskResponse"
+                },
+                "example": {
+                  "status": 100,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 11,
+                    "status": "Running",
+                    "amount": 100
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "createLiveAiVideo"
+      }
+    },
+    "/workflow/seedanceAiVideo": {
+      "post": {
+        "x-mint": {
+          "href": "/openapi-ref/workflow/seedance-ai-video",
+          "metadata": {
+            "sidebarTitle": "Seedance 原价"
+          }
+        },
+        "summary": "Seedance 原价",
+        "description": "",
+        "tags": ["视频生成-Seedance 原价"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "prompt": {
+                    "type": "string",
+                    "description": "提示词，长度不超过800个字。",
+                    "example": ""
+                  },
+                  "resolution_option": {
+                    "type": "integer",
+                    "enum": [1, 2, 3],
+                    "description": "分辨率\n1：480P（支持模型：全部模型）\n2：720P（支持模型：全部模型）\n3：1080P（支持模型：生成视频-即梦seedance2.0满血）"
+                  },
+                  "duration": {
+                    "type": "integer"
+                  },
+                  "aspect_ratio": {
+                    "type": "integer",
+                    "enum": [1, 2, 3, 4, 5],
+                    "description": "画面比例\n1：16:9\n2：9:16\n3：1:1\n4：4:3\n5：3:4",
+                    "example": 1
+                  },
+                  "reference_urls": {
+                    "type": "array",
+                    "description": "参考图/视频/音频视频:（仅支持mp4、mov格式，分辨率480P、、720P，时长2-15s(总时长不超过15s)，单视频不超过50MB;\n图片:单图小于30MB(总大小不超过64MB)\n音频:仅支持wav、mp3格式，时长2-15s，单个音频不超过15MB;）",
+                    "items": {
+                      "oneOf": [
+                        {
+                          "type": "integer",
+                          "description": "素材库资源 ID"
+                        },
+                        {
+                          "type": "string",
+                          "format": "uri",
+                          "description": "资源 URL"
+                        }
+                      ]
+                    }
+                  },
+                  "channel_option": {
+                    "type": "integer",
+                    "enum": [1, 2, 3, 4],
+                    "description": "渠道\n1：生成视频-即梦seedance2.0 满血\n3：生成视频-即梦seedance2.0-mini\n4：生成视频-即梦seedance2.0-mini",
+                    "example": 4
+                  }
+                },
+                "required": [
+                  "prompt",
+                  "resolution_option",
+                  "duration",
+                  "aspect_ratio",
+                  "reference_urls",
+                  "channel_option"
+                ]
+              },
+              "example": {
+                "prompt": "景别：中景\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\n表演/动作：先回头微笑，再自然挥手。\n镜头建议：镜头稳定，中景构图保留建筑背景。",
+                "resolution_option": 1,
+                "duration": 5,
+                "aspect_ratio": 3,
+                "reference_urls": [
+                  17,
+                  "https://p3-bot-workflow-sign.byteimg.com/tos-cn-i-mdko3gqilj/db4da158ef7b49369ad258ba25b47dc2.jpg~tplv-mdko3gqilj-image.image?rk3s=81d4c505&x-expires=1808445522&x-signature=vdujF9FoBAwSe88%2Fv5uc4eXbCQU%3D&x-wf-file_name=20260428-095824.jpg"
+                ],
+                "channel_option": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoTaskResponse"
+                },
+                "example": {
+                  "status": 100,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 11,
+                    "status": "Running",
+                    "amount": 100
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "createSeedanceAiVideo"
+      }
+    },
+    "/workflow/aiVideo": {
+      "post": {
+        "x-mint": {
+          "href": "/openapi-ref/workflow/ai-video",
+          "metadata": {
+            "sidebarTitle": "谷歌 Omni"
+          }
+        },
+        "summary": "谷歌 Omni",
+        "description": "",
+        "tags": ["视频生成-谷歌 Omni"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "prompt": {
+                    "type": "string",
+                    "description": "文本提示词",
+                    "example": "景别：中景\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\n表演/动作：先回头微笑，再自然挥手。\n镜头建议：镜头稳定，中景构图保留建筑背景。",
+                    "default": "景别：中景\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\n表演/动作：先回头微笑，再自然挥手。\n镜头建议：镜头稳定，中景构图保留建筑背景。"
+                  },
+                  "aspect_ratio": {
+                    "type": "integer",
+                    "description": "画面比例（1:【16:9】。2:【9:16】。3:【1:1】。4:【4:3】。5:【3:4】）（1：16:9；2：9:16；3：1:1；4：4:3；5：3:4）",
+                    "example": 3,
+                    "default": 3,
+                    "enum": [1, 2, 3, 4, 5]
+                  },
+                  "duration": {
+                    "type": "integer",
+                    "description": "需要生产视频的时长（最多10秒）",
+                    "example": 5,
+                    "minimum": 1,
+                    "maximum": 10
+                  },
+                  "resolution_option": {
+                    "type": "integer",
+                    "description": "分辨率\n2：720P\n3：1080P（2：720p；3：1080p）",
+                    "example": 2,
+                    "default": 2,
+                    "enum": [2, 3]
+                  },
+                  "images": {
+                    "type": "array",
+                    "description": "参考图片（最多上传7张）",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "prompt",
+                  "aspect_ratio",
+                  "duration",
+                  "resolution_option"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoTaskResponse"
+                },
+                "example": {
+                  "status": 100,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 11,
+                    "status": "Running",
+                    "amount": 100
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "createOmniVideo"
       }
     }
   },
