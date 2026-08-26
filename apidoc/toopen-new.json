@@ -13,18 +13,18 @@
         "properties": {
           "id": {
             "type": "integer",
-            "description": "任务的 ID 记录。",
+            "description": "任务的 ID 记录",
             "example": 11
           },
           "status": {
             "type": "string",
             "enum": ["Running", "Success", "Failed"],
-            "description": "任务状态。",
+            "description": "状态（Success：执行成功。Running：执行中。Fail：执行失败）",
             "example": "Running"
           },
           "amount": {
             "type": "number",
-            "description": "任务所消耗的算力。",
+            "description": "任务预计扣除算力",
             "example": 100
           }
         }
@@ -328,7 +328,7 @@
                 "properties": {
                   "model_option": {
                     "type": "integer",
-                    "description": "模型选择（1 sd2.5）可以不传，现在就一个模型，后端已经默认了",
+                    "description": "模型选择（1 sd2.5）",
                     "enum": [1],
                     "example": 1
                   },
@@ -356,9 +356,26 @@
                     "enum": [1, 2, 3, 4, 5],
                     "example": 4
                   },
+                  "reference_urls": {
+                    "type": "array",
+                    "description": "参考图/视频/音频视频:（仅支持mp4、mov格式，分辨率480P、、720P，时长2-15s(总时长不超过15s)，单视频不超过50MB;\n图片:单图小于30MB(总大小不超过64MB)\n音频:仅支持wav、mp3格式，时长2-15s，单个音频不超过15MB;）",
+                    "items": {
+                      "oneOf": [
+                        {
+                          "type": "integer",
+                          "description": "素材库资源 ID"
+                        },
+                        {
+                          "type": "string",
+                          "format": "uri",
+                          "description": "资源 URL"
+                        }
+                      ]
+                    }
+                  },
                   "omni_reference_task_type": {
                     "type": "string",
-                    "description": "模式\n默认值auto\nauto:由模型根据输入素材和提示词自动判定任务类型\nreference:全能参考\nedit:视频编辑（视频编辑，生成视频时长可不传）\nextend:视频延长",
+                    "description": "模式\n默认值auto\nauto：由模型根据输入素材和提示词自动判定任务类型\nreference：全能参考\nedit：视频编辑（**当模式为视频编辑时，duration 时长不需要，输入会被自动忽略。**）\nextend：视频延长",
                     "enum": ["auto", "reference", "edit", "extend"],
                     "example": "auto",
                     "default": "auto"
@@ -371,6 +388,21 @@
                   "duration",
                   "aspect_ratio",
                   "omni_reference_task_type"
+                ],
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "omni_reference_task_type": {
+                          "const": "edit"
+                        }
+                      }
+                    },
+                    "then": {},
+                    "else": {
+                      "required": ["duration"]
+                    }
+                  }
                 ]
               }
             }
