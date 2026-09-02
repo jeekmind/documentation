@@ -1366,7 +1366,8 @@
                   },
                   "keywords": {
                     "type": "string",
-                    "description": "关键词"
+                    "description": "关键词",
+                    "example": ""
                   },
                   "file_type": {
                     "type": "string",
