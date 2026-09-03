@@ -371,7 +371,8 @@
                           "description": "资源 URL"
                         }
                       ]
-                    }
+                    },
+                    "example": []
                   },
                   "omni_reference_task_type": {
                     "type": "string",
@@ -470,10 +471,7 @@
                       "type": "string",
                       "format": "uri"
                     },
-                    "example": [
-                      "https://ark-project.tos-cn-beijing.volces.com/doc_image/r2v_tea_pic1.jpg",
-                      "https://ark-project.tos-cn-beijing.volces.com/doc_image/r2v_tea_pic2.jpg"
-                    ]
+                    "example": []
                   },
                   "duration": {
                     "type": "integer",
@@ -571,12 +569,7 @@
                       "type": "string",
                       "format": "uri"
                     },
-                    "example": [
-                      "https://ark-project.tos-cn-beijing.volces.com/doc_image/r2v_tea_pic1.jpg",
-                      "https://ark-project.tos-cn-beijing.volces.com/doc_image/r2v_tea_pic2.jpg",
-                      "https://ark-project.tos-cn-beijing.volces.com/doc_audio/r2v_tea_audio1.mp3",
-                      "https://ark-project.tos-cn-beijing.volces.com/doc_video/r2v_tea_video1.mp4"
-                    ]
+                    "example": []
                   }
                 },
                 "required": [
@@ -771,7 +764,8 @@
                           "description": "资源 URL"
                         }
                       ]
-                    }
+                    },
+                    "example": []
                   }
                 },
                 "required": [
@@ -873,7 +867,8 @@
                           "description": "资源 URL"
                         }
                       ]
-                    }
+                    },
+                    "example": []
                   }
                 },
                 "required": [
@@ -985,10 +980,7 @@
                 "resolution_option": 1,
                 "duration": 5,
                 "aspect_ratio": 3,
-                "reference_urls": [
-                  17,
-                  "https://p3-bot-workflow-sign.byteimg.com/tos-cn-i-mdko3gqilj/db4da158ef7b49369ad258ba25b47dc2.jpg~tplv-mdko3gqilj-image.image?rk3s=81d4c505&x-expires=1808445522&x-signature=vdujF9FoBAwSe88%2Fv5uc4eXbCQU%3D&x-wf-file_name=20260428-095824.jpg"
-                ],
+                "reference_urls": [],
                 "channel_option": 1
               }
             }
@@ -1067,7 +1059,8 @@
                     "description": "参考图片（最多上传7张）",
                     "items": {
                       "type": "string"
-                    }
+                    },
+                    "example": []
                   }
                 },
                 "required": [
@@ -1431,12 +1424,12 @@
                               "file_name": {
                                 "type": "string",
                                 "description": "文件名",
-                                "example": "sample-image.jpg"
+                                "example": "r2v_tea_pic1.jpg"
                               },
                               "file_url": {
                                 "type": "string",
                                 "description": "文件链接",
-                                "example": "https://example.com/assets/sample-image.jpg"
+                                "example": ""
                               },
                               "assetType": {
                                 "type": "string",
@@ -1532,12 +1525,12 @@
                   "file_name": {
                     "type": "string",
                     "description": "文件名",
-                    "example": "sample-image.jpg"
+                    "example": "r2v_tea_pic1.jpg"
                   },
                   "file_url": {
                     "type": "string",
                     "description": "文件链接",
-                    "example": "https://example.com/assets/sample-image.jpg"
+                    "example": ""
                   }
                 },
                 "required": ["file_name", "file_url"]
