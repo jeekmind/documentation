@@ -508,6 +508,108 @@
         "operationId": "createSeedanceExperience1Video"
       }
     },
+    "/workflow/seedanceDiscountChannel2": {
+      "post": {
+        "summary": "视频生成-Seedance 体验 2",
+        "description": "",
+        "x-mint": {
+          "href": "/openapi-ref/workflow/seedance-discount-channel2",
+          "metadata": {
+            "sidebarTitle": "Seedance 体验2"
+          }
+        },
+        "tags": ["视频生成-Seedance 体验2"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "prompt": {
+                    "type": "string",
+                    "description": "提示词",
+                    "example": "生成一段科幻世界的视频",
+                    "default": "生成一段科幻电影"
+                  },
+                  "aspect_ratio": {
+                    "type": "integer",
+                    "description": "画面比例\n1:【16:9】\n2:【9:16】\n3:【1:1】\n4:【4:3】\n5:【3:4】",
+                    "example": 2,
+                    "default": 2
+                  },
+                  "model_option": {
+                    "type": "integer",
+                    "description": "模型\n(1：官方优惠 - Seedance2.0满血 - 支持人脸；\n2：官方优惠 - Seedance2.0fast - 支持人脸；\n3：官方优惠 - Seedance2.5 - 支持人脸；\n4：Seedance2.5 - 支持人脸\n)",
+                    "example": 1,
+                    "default": 1,
+                    "enum": [1, 5]
+                  },
+                  "resolution_option": {
+                    "type": "integer",
+                    "description": "分辨率\n1：代表480p\n2：代表720p\n3：代表1080p \n4：代表2K\n5：代表3K\n6：代表4k\n\n\n模型3支持：2",
+                    "example": 2,
+                    "default": 2
+                  },
+                  "reference_urls": {
+                    "type": "array",
+                    "description": "2.5支持30图10音频10视频",
+                    "items": {
+                      "oneOf": [
+                        {
+                          "type": "integer",
+                          "description": "素材库资源 ID"
+                        },
+                        {
+                          "type": "string",
+                          "format": "uri",
+                          "description": "资源 URL"
+                        }
+                      ]
+                    },
+                    "example": []
+                  },
+                  "duration": {
+                    "type": "integer",
+                    "description": "时长\n\n2.5支持 4-30s\n2.0支持 4-15s",
+                    "example": 15,
+                    "minimum": 4,
+                    "maximum": 30
+                  }
+                },
+                "required": [
+                  "prompt",
+                  "aspect_ratio",
+                  "model_option",
+                  "resolution_option",
+                  "duration"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoTaskResponse"
+                },
+                "example": {
+                  "status": 100,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 11,
+                    "status": "Running",
+                    "amount": 100
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/workflow/seedanceDiscountChannel3": {
       "post": {
         "x-mint": {
@@ -610,108 +712,6 @@
           }
         },
         "operationId": "createSeedanceExperience3Video"
-      }
-    },
-    "/workflow/seedanceDiscountChannel2": {
-      "post": {
-        "summary": "视频生成-Seedance 体验 2",
-        "description": "",
-        "x-mint": {
-          "href": "/openapi-ref/workflow/seedance-discount-channel2",
-          "metadata": {
-            "sidebarTitle": "Seedance 体验2"
-          }
-        },
-        "tags": ["视频生成-Seedance 体验2"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "prompt": {
-                    "type": "string",
-                    "description": "提示词",
-                    "example": "生成一段科幻世界的视频",
-                    "default": "生成一段科幻电影"
-                  },
-                  "aspect_ratio": {
-                    "type": "integer",
-                    "description": "画面比例\n1:【16:9】\n2:【9:16】\n3:【1:1】\n4:【4:3】\n5:【3:4】",
-                    "example": 2,
-                    "default": 2
-                  },
-                  "model_option": {
-                    "type": "integer",
-                    "description": "模型\n(1：官方优惠 - Seedance2.0满血 - 支持人脸；\n2：官方优惠 - Seedance2.0fast - 支持人脸；\n3：官方优惠 - Seedance2.5 - 支持人脸；\n4：Seedance2.5 - 支持人脸\n)",
-                    "example": 1,
-                    "default": 1,
-                    "enum": [1, 5]
-                  },
-                  "resolution_option": {
-                    "type": "integer",
-                    "description": "分辨率\n1：代表480p\n2：代表720p\n3：代表1080p \n4：代表2K\n5：代表3K\n6：代表4k\n\n\n模型3支持：2",
-                    "example": 2,
-                    "default": 2
-                  },
-                  "reference_urls": {
-                    "type": "array",
-                    "description": "2.5支持30图10音频10视频",
-                    "items": {
-                      "oneOf": [
-                        {
-                          "type": "integer",
-                          "description": "素材库资源 ID"
-                        },
-                        {
-                          "type": "string",
-                          "format": "uri",
-                          "description": "资源 URL"
-                        }
-                      ]
-                    },
-                    "example": []
-                  },
-                  "duration": {
-                    "type": "integer",
-                    "description": "时长\n\n2.5支持 4-30s\n2.0支持 4-15s",
-                    "example": 15,
-                    "minimum": 4,
-                    "maximum": 30
-                  }
-                },
-                "required": [
-                  "prompt",
-                  "aspect_ratio",
-                  "model_option",
-                  "resolution_option",
-                  "duration"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VideoTaskResponse"
-                },
-                "example": {
-                  "status": 100,
-                  "message": "操作成功",
-                  "data": {
-                    "id": 11,
-                    "status": "Running",
-                    "amount": 100
-                  }
-                }
-              }
-            }
-          }
-        }
       }
     },
     "/workflow/seedanceDiscount": {
