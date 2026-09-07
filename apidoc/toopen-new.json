@@ -285,12 +285,7 @@
                 "example": {
                   "status": 100,
                   "message": "操作成功",
-                  "data": {
-                    "id": 376592,
-                    "status": "Success",
-                    "temporary_url": "https://ark-acg-beijing.tos-cn-beijing.volces.com/doubao-seedance-2-5/cgt-20260904165749-7pm5n.mp4",
-                    "msg": null
-                  }
+                  "data": "{\"id\": 376592,\"status\": \"Success\",\"temporary_url\": \"https://ark-acg-beijing.tos-cn-beijing.volces.com/doubao-seedance-2-5/cgt-20260904165749-7pm5n.mp4\",\"msg\": null}"
                 }
               }
             }
@@ -427,12 +422,12 @@
         "x-mint": {
           "href": "/openapi-ref/workflow/seedance-discount-channel1",
           "metadata": {
-            "sidebarTitle": "Seedance2.0 体验1"
+            "sidebarTitle": "Seedance 体验1"
           }
         },
-        "summary": "Seedance2.0 体验1",
+        "summary": "Seedance 体验1",
         "description": "",
-        "tags": ["视频生成-Seedance2.0 体验1"],
+        "tags": ["视频生成-Seedance 体验1"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -518,12 +513,12 @@
         "x-mint": {
           "href": "/openapi-ref/workflow/seedance-discount-channel3",
           "metadata": {
-            "sidebarTitle": "Seedance2.0 体验3"
+            "sidebarTitle": "Seedance 体验3"
           }
         },
-        "summary": "Seedance2.0 体验3",
+        "summary": "Seedance 体验3",
         "description": "",
-        "tags": ["视频生成-Seedance2.0 体验3"],
+        "tags": ["视频生成-Seedance 体验3"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -619,15 +614,15 @@
     },
     "/workflow/seedanceDiscountChannel2": {
       "post": {
-        "summary": "视频生成-Seedance2.0 体验 2",
+        "summary": "视频生成-Seedance 体验 2",
         "description": "",
         "x-mint": {
           "href": "/openapi-ref/workflow/seedance-discount-channel2",
           "metadata": {
-            "sidebarTitle": "Seedance2.0 体验2"
+            "sidebarTitle": "Seedance 体验2"
           }
         },
-        "tags": ["视频生成-Seedance2.0 体验2"],
+        "tags": ["视频生成-Seedance 体验2"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -724,12 +719,12 @@
         "x-mint": {
           "href": "/openapi-ref/workflow/seedance-discount",
           "metadata": {
-            "sidebarTitle": "Seedance2.0 限时折扣（支持人脸）"
+            "sidebarTitle": "Seedance 限时折扣（支持人脸）"
           }
         },
-        "summary": "Seedance2.0 限时折扣（支持人脸）",
+        "summary": "Seedance 限时折扣（支持人脸）",
         "description": "",
-        "tags": ["视频生成-Seedance2.0 限时折扣（支持人脸）"],
+        "tags": ["视频生成-Seedance 限时折扣（支持人脸）"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -822,7 +817,7 @@
         },
         "summary": "Seedance（支持人脸）",
         "description": "",
-        "tags": ["视频生成-Seedance2.0（支持人脸）"],
+        "tags": ["视频生成-Seedance（支持人脸）"],
         "requestBody": {
           "content": {
             "application/json": {
