@@ -63,10 +63,10 @@
             "description": "任务的状态。\nRunning 表示正在运行，\nSuccess 表示成功，\nFailed 表示失败。",
             "example": "Success"
           },
-          "response_json": {
-            "type": "object",
-            "description": "执行结果内容。",
-            "example": "# AD钙奶产品市场调研报告\n\n## 一、品牌背..."
+          "temporary_url": {
+            "type": "string",
+            "description": "结果临时 URL",
+            "example": "https://ark-acg-beijing.tos-cn-beijing.volces.com/doubao-seedance-2-5/cgt-20260904165749-7pm5n.mp4"
           }
         }
       },
@@ -285,18 +285,12 @@
                 "example": {
                   "status": 100,
                   "message": "操作成功",
-                  "data": "{\"id\": 376592,\"status\": \"Success\",\"temporary_url\": \"https://ark-acg-beijing.tos-cn-beijing.volces.com/doubao-seedance-2-5/cgt-20260904165749-7pm5n.mp4\",\"msg\": null}"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "失败",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {}
+                  "data": {
+                    "id": 376592,
+                    "status": "Success",
+                    "temporary_url": "https://ark-acg-beijing.tos-cn-beijing.volces.com/doubao-seedance-2-5/cgt-20260904165749-7pm5n.mp4",
+                    "msg": null
+                  }
                 }
               }
             }
