@@ -285,7 +285,12 @@
                 "example": {
                   "status": 100,
                   "message": "操作成功",
-                  "data": "{\"id\": 376592,\"status\": \"Success\",\"temporary_url\": \"https://ark-acg-beijing.tos-cn-beijing.volces.com/doubao-seedance-2-5/cgt-20260904165749-7pm5n.mp4\",\"msg\": null}"
+                  "data": {
+                    "id": 376592,
+                    "status": "Success",
+                    "temporary_url": "https://ark-acg-beijing.tos-cn-beijing.volces.com/doubao-seedance-2-5/cgt-20260904165749-7pm5n.mp4",
+                    "msg": null
+                  }
                 }
               }
             }
