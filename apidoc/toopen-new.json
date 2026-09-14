@@ -256,7 +256,7 @@
         },
         "summary": "获取生成结果",
         "description": "",
-        "tags": ["视频生成-获取生成结果"],
+        "tags": ["获取生成结果"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -264,7 +264,7 @@
                 "type": "object",
                 "properties": {
                   "id": {
-                    "type": "number",
+                    "type": "integer",
                     "description": "会话ID",
                     "example": 1
                   }
@@ -289,20 +289,142 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "失败",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {}
-                }
+          }
+        },
+        "operationId": "getVideoResult"
+      }
+    },
+    "/workflow/aiVideoParse": {
+      "post": {
+        "summary": "视频解析",
+        "x-mint": {
+          "href": "/openapi-ref/workflow/ai-video-parse",
+          "metadata": {
+            "sidebarTitle": "视频解析"
+          }
+        },
+        "tags": ["视频解析"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file_url": {
+                    "type": "string",
+                    "description": "视频 URL",
+                    "example": "https://wenlv-debug.oss-cn-shenzhen.aliyuncs.com/carimg/2baf3c/2025-10/0//coze_AiVideo202510291126186944.mp4"
+                  }
+                },
+                "required": ["file_url"]
               }
             }
           }
         },
-        "operationId": "getVideoResult"
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoTaskResponse"
+                },
+                "example": {
+                  "status": 100,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 17477,
+                    "status": "Running",
+                    "amount": "12"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workflow/seedreamAiImage": {
+      "post": {
+        "summary": "图片生成-Seedream 5.0 Lite",
+        "description": "",
+        "tags": ["图片生成-Seedream 5.0 Lite"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "channel_option": {
+                    "type": "integer",
+                    "description": "渠道（1 渠道一）",
+                    "example": 1,
+                    "default": 1
+                  },
+                  "prompt": {
+                    "type": "string",
+                    "description": "文本提示词",
+                    "example": "生成今年世界杯的宣传海报"
+                  },
+                  "resolution_option": {
+                    "type": "integer",
+                    "description": "分辨率\n3：2K，4：3K，5：4K",
+                    "example": 3
+                  },
+                  "aspect_ratio": {
+                    "type": "integer",
+                    "description": "画面比例（1:【16:9】。2:【9:16】。3:【1:1】。4:【4:3】。5:【3:4】）",
+                    "example": 3
+                  },
+                  "reference_urls": {
+                    "type": "array",
+                    "description": "参考图片 URL",
+                    "items": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "example": [
+                      "https://ark-project.tos-cn-beijing.volces.com/doc_image/i2v_foxrgirl.png"
+                    ]
+                  },
+                  "n": {
+                    "type": "integer",
+                    "description": "输出图片数量：1~5",
+                    "example": 3
+                  }
+                },
+                "required": [
+                  "channel_option",
+                  "prompt",
+                  "resolution_option",
+                  "aspect_ratio",
+                  "n"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoTaskResponse"
+                },
+                "example": {
+                  "status": 100,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 17477,
+                    "status": "Running",
+                    "amount": "12"
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/workflow/seedanceLongAiVideo": {
