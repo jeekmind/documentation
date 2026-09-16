@@ -280,7 +280,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/VideoResultResponse"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/VideoResultResponse",
+                      "description": "视频解析结果"
+                    }
+                  ]
                 },
                 "example": {
                   "status": 100,
@@ -569,7 +574,7 @@
                   },
                   "aspect_ratio": {
                     "type": "integer",
-                    "description": "画面比例\n1:【16:9】\n2:【9:16】\n3:【1:1】\n模型6：支持1、2、3\n模型7：支持1、2",
+                    "description": "画面比例\n1:【16:9】\n2:【9:16】\n3:【1:1】",
                     "example": 2,
                     "enum": [1, 2, 3]
                   },
@@ -668,8 +673,7 @@
                     "type": "integer",
                     "description": "模型\n(1：官方优惠 - Seedance2.0满血 - 支持人脸；\n2：官方优惠 - Seedance2.0fast - 支持人脸；\n3：官方优惠 - Seedance2.5 - 支持人脸；\n4：Seedance2.5 - 支持人脸\n)",
                     "example": 1,
-                    "default": 1,
-                    "enum": [1, 5]
+                    "enum": [1, 2, 3, 4]
                   },
                   "resolution_option": {
                     "type": "integer",
@@ -1093,7 +1097,7 @@
                   },
                   "channel_option": {
                     "type": "integer",
-                    "enum": [1, 2, 3, 4],
+                    "enum": [1, 3, 4],
                     "description": "渠道\n1：生成视频-即梦seedance2.0 满血\n3：生成视频-即梦seedance2.0-mini\n4：生成视频-即梦seedance2.0-mini",
                     "example": 4
                   }
@@ -1167,7 +1171,7 @@
                   },
                   "aspect_ratio": {
                     "type": "integer",
-                    "description": "画面比例（1:【16:9】。2:【9:16】。3:【1:1】。4:【4:3】。5:【3:4】）（1：16:9；2：9:16；3：1:1；4：4:3；5：3:4）",
+                    "description": "画面比例（\n1:【16:9】\n2:【9:16】\n3:【1:1】\n4:【4:3】\n5:【3:4】\n）",
                     "example": 3,
                     "default": 3,
                     "enum": [1, 2, 3, 4, 5]
