@@ -65,8 +65,7 @@
           },
           "response_json": {
             "type": "object",
-            "description": "执行结果内容。",
-            "example": "# AD钙奶产品市场调研报告\n\n## 一、品牌背..."
+            "description": "执行结果内容。"
           }
         }
       },
@@ -86,6 +85,52 @@
           },
           "data": {
             "$ref": "#/components/schemas/VideoResultData"
+          }
+        }
+      },
+      "SeedreamTaskData": {
+        "type": "object",
+        "required": ["id", "status", "response_json"],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "任务的 ID 记录。",
+            "example": 376618
+          },
+          "status": {
+            "type": "string",
+            "enum": ["Running", "Success", "Failed"],
+            "description": "任务的状态。\nRunning 表示正在运行，\nSuccess 表示成功，\nFailed 表示失败。",
+            "example": "Success"
+          },
+          "response_json": {
+            "type": "string",
+            "description": "执行结果内容，JSON 字符串。解析后为图片对象数组，每项包含 id（图片 ID）、url（图片访问地址）、status（success：生成成功）、error_message（失败原因）。",
+            "example": "[{\"id\": 494, \"url\": \"https://oss.jeekmind.com/carimg/2baf3c/2026-09/0/jeekup_images202609142128248742.png\", \"status\": \"success\", \"error_message\": \"\"}]"
+          },
+          "msg": {
+            "type": ["string", "null"],
+            "description": "失败时的错误信息，成功时为 null。",
+            "example": null
+          }
+        }
+      },
+      "SeedreamTaskResponse": {
+        "type": "object",
+        "required": ["status", "message", "data"],
+        "properties": {
+          "status": {
+            "type": "integer",
+            "description": "状态码，100 表示成功，其他表示失败。",
+            "example": 100
+          },
+          "message": {
+            "type": "string",
+            "description": "操作结果的提示消息。",
+            "example": "操作成功"
+          },
+          "data": {
+            "$ref": "#/components/schemas/SeedreamTaskData"
           }
         }
       }
@@ -284,6 +329,10 @@
                     {
                       "$ref": "#/components/schemas/VideoResultResponse",
                       "description": "视频解析结果"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SeedreamTaskResponse",
+                      "description": "Seedream 任务结果"
                     }
                   ]
                 },
