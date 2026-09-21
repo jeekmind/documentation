@@ -829,20 +829,104 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "失败",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {}
-                }
+          }
+        },
+        "operationId": "createSeedanceExperience3Video"
+      }
+    },
+    "/workflow/seedanceDiscountChannel6": {
+      "post": {
+        "x-mint": {
+          "href": "/openapi-ref/workflow/seedance-discount-channel6",
+          "metadata": {
+            "sidebarTitle": "MiniMax"
+          }
+        },
+        "summary": "MiniMax",
+        "description": "",
+        "tags": ["视频生成-MiniMax"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "prompt": {
+                    "type": "string",
+                    "description": "提示词",
+                    "example": "全程使用视频1的第一视角构图，全程使用音频1作为背景音乐。第一人称视角果茶宣传广告，seedance牌「苹苹安安」苹果果茶限定款；首帧为图片1，你的手摘下一颗带晨露的阿克苏红苹果，轻脆的苹果碰撞声；2-4 秒：第一人称手持举杯，你将图片2中的果茶举到镜头前（模拟递到观众面前的视角），杯身标签清晰可见，背景音「来一口鲜爽」，尾帧定格为图片2。背景声音统一为女生音色。",
+                    "default": ""
+                  },
+                  "aspect_ratio": {
+                    "type": "integer",
+                    "description": "画面比例\n1:【16:9】\n2:【9:16】\n3:【1:1】\n4:【3:4】\n5:【4:3】",
+                    "example": 2,
+                    "enum": [1, 2, 3, 4, 5]
+                  },
+                  "model_option": {
+                    "type": "integer",
+                    "description": "模型选择。请使用 `1`",
+                    "example": 1,
+                    "enum": [1]
+                  },
+                  "resolution_option": {
+                    "type": "integer",
+                    "description": "图像分辨率\n1：480p、\n2：720p、\n3：1080p、\n4：2K、\n5：3K、\n6：4K、\n7：768p、\n8：1440p",
+                    "example": 3,
+                    "enum": [1, 2, 3, 4, 5, 6, 7, 8]
+                  },
+                  "duration": {
+                    "type": "integer",
+                    "description": "生成视频时长",
+                    "example": 4
+                  },
+                  "reference_urls": {
+                    "type": "array",
+                    "description": "参考素材",
+                    "items": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  },
+                  "context_ir_enabled": {
+                    "type": "boolean",
+                    "description": "是否开启提示词优化（true ：开启，false ：关闭）默认开启",
+                    "default": true,
+                    "example": true
+                  }
+                },
+                "required": [
+                  "prompt",
+                  "aspect_ratio",
+                  "model_option",
+                  "resolution_option",
+                  "duration"
+                ]
               }
             }
           }
         },
-        "operationId": "createSeedanceExperience3Video"
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoTaskResponse"
+                },
+                "example": {
+                  "status": 100,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 11,
+                    "status": "Running",
+                    "amount": 100
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/workflow/seedanceDiscount": {
