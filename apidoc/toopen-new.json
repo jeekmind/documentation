@@ -1,5 +1,4 @@
 {
-  "$schema": "https://spec.openapis.org/oas/3.1/schema-base/2025-11-23",
   "info": {
     "title": "AI智能助手",
     "description": "",
@@ -353,7 +352,8 @@
                     "id": 376592,
                     "status": "Success",
                     "temporary_url": "https://ark-acg-beijing.tos-cn-beijing.volces.com/doubao-seedance-2-5/cgt-20260904165749-7pm5n.mp4",
-                    "msg": null
+                    "msg": null,
+                    "amount": -4
                   }
                 }
               }
