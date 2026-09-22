@@ -63,6 +63,11 @@
             "enum": ["Running", "Success", "Failed"],
             "description": "任务的状态。\nRunning 表示正在运行，\nSuccess 表示成功，\nFailed 表示失败。",
             "example": "Success"
+          },
+          "amount": {
+            "type": "integer",
+            "description": "任务的消耗的算力，仅在 Success 后显示。",
+            "example": 100
           }
         },
         "oneOf": [
@@ -139,6 +144,11 @@
             "type": ["string", "null"],
             "description": "失败时的错误信息，成功时为 null。",
             "example": null
+          },
+          "amount": {
+            "type": "integer",
+            "description": "任务的消耗的算力，仅在 Success 后显示。",
+            "example": 100
           }
         }
       }
