@@ -344,7 +344,7 @@
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/VideoResultResponse",
-                      "description": "视频解析结果"
+                      "description": "视频生成结果"
                     },
                     {
                       "$ref": "#/components/schemas/SeedreamTaskResponse",
