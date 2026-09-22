@@ -50,7 +50,7 @@
       },
       "VideoResultData": {
         "type": "object",
-        "required": ["id", "status", "response_json"],
+        "required": ["id", "status"],
         "properties": {
           "id": {
             "type": "integer",
@@ -62,12 +62,28 @@
             "enum": ["Running", "Success", "Failed"],
             "description": "任务的状态。\nRunning 表示正在运行，\nSuccess 表示成功，\nFailed 表示失败。",
             "example": "Success"
-          },
-          "response_json": {
-            "type": "object",
-            "description": "执行结果内容。"
           }
-        }
+        },
+        "oneOf": [
+          {
+            "required": ["response_json"],
+            "properties": {
+              "response_json": {
+                "type": "object",
+                "description": "执行结果内容。"
+              }
+            }
+          },
+          {
+            "required": ["temporary_url"],
+            "properties": {
+              "temporary_url": {
+                "type": "string",
+                "description": "结果 URL"
+              }
+            }
+          }
+        ]
       },
       "VideoResultResponse": {
         "type": "object",
