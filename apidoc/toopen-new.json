@@ -67,32 +67,20 @@
             "type": "integer",
             "description": "任务的消耗的算力，仅在 Success 后显示。",
             "example": 100
-          }
-        },
-        "oneOf": [
-          {
-            "required": ["response_json"],
-            "properties": {
-              "response_json": {
-                "type": "string",
-                "description": "执行结果内容。"
-              }
-            }
           },
-          {
-            "required": ["temporary_url"],
-            "properties": {
-              "temporary_url": {
-                "type": "string",
-                "description": "结果 URL"
-              },
-              "last_frame_url": {
-                "type": "string",
-                "description": "最后一帧 URL"
-              }
-            }
+          "response_json": {
+            "type": "string",
+            "description": "执行结果内容。与 temporary_url 之间仅返回一个。"
+          },
+          "temporary_url": {
+            "type": "string",
+            "description": "结果。与 response_json 之间仅返回一个。"
+          },
+          "last_frame_url": {
+            "type": "string",
+            "description": "最后一帧 URL"
           }
-        ]
+        }
       },
       "ResultResponse": {
         "type": "object",
