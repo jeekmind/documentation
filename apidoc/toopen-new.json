@@ -85,6 +85,10 @@
               "temporary_url": {
                 "type": "string",
                 "description": "结果 URL"
+              },
+              "last_frame_url": {
+                "type": "string",
+                "description": "最后一帧 URL"
               }
             }
           }
@@ -716,17 +720,18 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "prompt": {
-                    "type": "string",
-                    "description": "提示词",
-                    "example": "生成一段科幻世界的视频",
-                    "default": "生成一段科幻电影"
-                  },
                   "aspect_ratio": {
                     "type": "integer",
                     "description": "画面比例\n1:【16:9】\n2:【9:16】\n3:【1:1】\n4:【4:3】\n5:【3:4】",
                     "example": 2,
                     "default": 2
+                  },
+                  "duration": {
+                    "type": "integer",
+                    "description": "时长\n\n2.5支持 4-30s\n2.0支持 4-15s",
+                    "example": 15,
+                    "minimum": 4,
+                    "maximum": 30
                   },
                   "model_option": {
                     "type": "integer",
@@ -734,11 +739,51 @@
                     "example": 1,
                     "enum": [1, 2, 3, 4]
                   },
+                  "priority": {
+                    "type": "integer",
+                    "description": "优先级（0到9）",
+                    "example": 1,
+                    "minimum": 1,
+                    "maximum": 9
+                  },
+                  "prompt": {
+                    "type": "string",
+                    "description": "提示词",
+                    "example": "生成一段科幻世界的视频",
+                    "default": "生成一段科幻电影"
+                  },
                   "resolution_option": {
                     "type": "integer",
                     "description": "分辨率\n1：代表480p\n2：代表720p\n3：代表1080p \n4：代表2K\n5：代表3K\n6：代表4k\n\n\n模型3支持：2",
                     "example": 2,
-                    "default": 2
+                    "default": 2,
+                    "enum": [1, 2, 3, 4, 5, 6]
+                  },
+                  "return_last_frame": {
+                    "type": "integer",
+                    "description": "是否返回最后一帧【0 否 1 是】（默认：0）",
+                    "default": 0,
+                    "example": 0,
+                    "enum": [0, 1]
+                  },
+                  "watermark": {
+                    "type": "integer",
+                    "description": "是否关闭水印【0 否 1 是】（默认：1）",
+                    "default": 1,
+                    "example": 1,
+                    "enum": [0, 1]
+                  },
+                  "generate_audio": {
+                    "type": "integer",
+                    "description": "是否生成音频【0 否 1 是】（默认0)",
+                    "default": 0,
+                    "example": 0,
+                    "enum": [0, 1]
+                  },
+                  "tools": {
+                    "type": "object",
+                    "description": "工具",
+                    "example": { "type": "web_search" }
                   },
                   "reference_urls": {
                     "type": "array",
@@ -757,21 +802,17 @@
                       ]
                     },
                     "example": []
-                  },
-                  "duration": {
-                    "type": "integer",
-                    "description": "时长\n\n2.5支持 4-30s\n2.0支持 4-15s",
-                    "example": 15,
-                    "minimum": 4,
-                    "maximum": 30
                   }
                 },
                 "required": [
-                  "prompt",
                   "aspect_ratio",
+                  "duration",
                   "model_option",
+                  "priority",
+                  "prompt",
                   "resolution_option",
-                  "duration"
+                  "return_last_frame",
+                  "watermark"
                 ]
               }
             }
