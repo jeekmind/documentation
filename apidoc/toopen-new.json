@@ -781,9 +781,9 @@
                     "enum": [0, 1]
                   },
                   "tools": {
-                    "type": "object",
+                    "type": "array",
                     "description": "工具",
-                    "example": { "type": "web_search" }
+                    "example": [{ "type": "web_search" }]
                   },
                   "reference_urls": {
                     "type": "array",
