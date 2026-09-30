@@ -529,8 +529,8 @@
                     "type": "integer",
                     "description": "输出图片数量：1~5",
                     "example": 3,
-                    "min": 1,
-                    "max": 5
+                    "minimum": 1,
+                    "maximum": 5
                   },
                   "prompt": {
                     "type": "string",
@@ -1037,17 +1037,18 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "prompt": {
-                    "type": "string",
-                    "description": "提示词",
-                    "example": "全程使用视频1的第一视角构图，全程使用音频1作为背景音乐。第一人称视角果茶宣传广告，seedance牌「苹苹安安」苹果果茶限定款；首帧为图片1，你的手摘下一颗带晨露的阿克苏红苹果，轻脆的苹果碰撞声；2-4 秒：第一人称手持举杯，你将图片2中的果茶举到镜头前（模拟递到观众面前的视角），杯身标签清晰可见，背景音「来一口鲜爽」，尾帧定格为图片2。背景声音统一为女生音色。",
-                    "default": ""
-                  },
                   "aspect_ratio": {
                     "type": "integer",
                     "description": "画面比例\n1:【16:9】\n2:【9:16】\n3:【1:1】\n4:【3:4】\n5:【4:3】",
                     "example": 2,
                     "enum": [1, 2, 3, 4, 5]
+                  },
+                  "duration": {
+                    "type": "integer",
+                    "description": "生成视频时长",
+                    "example": 4,
+                    "minimum": 4,
+                    "maximum": 15
                   },
                   "model_option": {
                     "type": "integer",
@@ -1055,16 +1056,23 @@
                     "example": 1,
                     "enum": [1]
                   },
+                  "prompt": {
+                    "type": "string",
+                    "description": "提示词",
+                    "example": "全程使用视频1的第一视角构图，全程使用音频1作为背景音乐。第一人称视角果茶宣传广告，seedance牌「苹苹安安」苹果果茶限定款；首帧为图片1，你的手摘下一颗带晨露的阿克苏红苹果，轻脆的苹果碰撞声；2-4 秒：第一人称手持举杯，你将图片2中的果茶举到镜头前（模拟递到观众面前的视角），杯身标签清晰可见，背景音「来一口鲜爽」，尾帧定格为图片2。背景声音统一为女生音色。",
+                    "default": ""
+                  },
                   "resolution_option": {
                     "type": "integer",
                     "description": "图像分辨率\n4：2K、\n5：3K、\n6：4K、\n7：768p、\n8：1440p",
                     "example": 4,
                     "enum": [4, 5, 6, 7, 8]
                   },
-                  "duration": {
-                    "type": "integer",
-                    "description": "生成视频时长",
-                    "example": 4
+                  "context_ir_enabled": {
+                    "type": "boolean",
+                    "description": "是否开启提示词优化（true ：开启，false ：关闭）默认开启",
+                    "default": true,
+                    "example": true
                   },
                   "reference_urls": {
                     "type": "array",
@@ -1072,21 +1080,18 @@
                     "items": {
                       "type": "string",
                       "format": "uri"
-                    }
-                  },
-                  "context_ir_enabled": {
-                    "type": "boolean",
-                    "description": "是否开启提示词优化（true ：开启，false ：关闭）默认开启",
-                    "default": true,
-                    "example": true
+                    },
+                    "example": [
+                      "https://ark-project.tos-cn-beijing.volces.com/doc_image/i2v_foxrgirl.png"
+                    ]
                   }
                 },
                 "required": [
-                  "prompt",
                   "aspect_ratio",
+                  "duration",
                   "model_option",
-                  "resolution_option",
-                  "duration"
+                  "prompt",
+                  "resolution_option"
                 ]
               }
             }
