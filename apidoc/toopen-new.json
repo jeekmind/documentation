@@ -498,6 +498,12 @@
     },
     "/workflow/seedreamAiImage": {
       "post": {
+        "x-mint": {
+          "href": "/openapi-ref/workflow/seedream-ai-image",
+          "metadata": {
+            "sidebarTitle": "Seedream 5.0 Lite"
+          }
+        },
         "summary": "图片生成-Seedream 5.0 Lite",
         "description": "",
         "tags": ["图片生成-Seedream 5.0 Lite"],
@@ -507,11 +513,24 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "aspect_ratio": {
+                    "type": "integer",
+                    "description": "画面比例（1:【16:9】。2:【9:16】。3:【1:1】。4:【4:3】。5:【3:4】）",
+                    "example": 3,
+                    "enum": [1, 2, 3, 4, 5]
+                  },
                   "channel_option": {
                     "type": "integer",
                     "description": "渠道（1 渠道一）",
                     "example": 1,
-                    "default": 1
+                    "enum": [1]
+                  },
+                  "n": {
+                    "type": "integer",
+                    "description": "输出图片数量：1~5",
+                    "example": 3,
+                    "min": 1,
+                    "max": 5
                   },
                   "prompt": {
                     "type": "string",
@@ -521,12 +540,8 @@
                   "resolution_option": {
                     "type": "integer",
                     "description": "分辨率\n3：2K，4：3K，5：4K",
-                    "example": 3
-                  },
-                  "aspect_ratio": {
-                    "type": "integer",
-                    "description": "画面比例（1:【16:9】。2:【9:16】。3:【1:1】。4:【4:3】。5:【3:4】）",
-                    "example": 3
+                    "example": 3,
+                    "enum": [3, 4, 5]
                   },
                   "reference_urls": {
                     "type": "array",
@@ -538,19 +553,14 @@
                     "example": [
                       "https://ark-project.tos-cn-beijing.volces.com/doc_image/i2v_foxrgirl.png"
                     ]
-                  },
-                  "n": {
-                    "type": "integer",
-                    "description": "输出图片数量：1~5",
-                    "example": 3
                   }
                 },
                 "required": [
-                  "channel_option",
-                  "prompt",
-                  "resolution_option",
                   "aspect_ratio",
-                  "n"
+                  "channel_option",
+                  "n",
+                  "prompt",
+                  "resolution_option"
                 ]
               }
             }
