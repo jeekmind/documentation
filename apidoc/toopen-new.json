@@ -796,11 +796,8 @@
                   "aspect_ratio",
                   "duration",
                   "model_option",
-                  "priority",
                   "prompt",
-                  "resolution_option",
-                  "return_last_frame",
-                  "watermark"
+                  "resolution_option"
                 ]
               }
             }
