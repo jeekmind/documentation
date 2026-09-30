@@ -405,6 +405,97 @@
         }
       }
     },
+    "/workflow/aiImage": {
+      "post": {
+        "x-mint": {
+          "href": "/openapi-ref/workflow/ai-image",
+          "metadata": {
+            "sidebarTitle": "通用图片生成"
+          }
+        },
+        "summary": "图片生成-通用图片生成",
+        "description": "",
+        "tags": ["图片生成-通用图片生成"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "aspect_ratio": {
+                    "type": "integer",
+                    "description": "画面比例（1:【16:9】。2:【9:16】。3:【1:1】。4:【4:3】。5:【3:4】）",
+                    "example": 3,
+                    "enum": [1, 2, 3, 4, 5]
+                  },
+                  "channel_option": {
+                    "type": "integer",
+                    "description": "渠道\n1:Mimage-渠道1\n2:Mimage-渠道2",
+                    "example": 1,
+                    "enum": [1, 2]
+                  },
+                  "prompt": {
+                    "type": "string",
+                    "description": "文本提示词",
+                    "example": "有关于莲花荷叶等其他元素的国画水墨风格，写意山水，风格像大师的发挥感，画面尽量饱满，画面体现廉政精神，不要有文字的出现"
+                  },
+                  "resolution_option": {
+                    "type": "integer",
+                    "description": "图像分辨率（1：720P\n2：1080P\n3：2K）",
+                    "example": 1,
+                    "enum": [1, 2, 3]
+                  },
+                  "quality": {
+                    "type": "integer",
+                    "description": "图像质量（1:'auto', \n2:'low', \n3:'medium', \n4:'high')",
+                    "example": 1,
+                    "enum": [1, 2, 3, 4]
+                  },
+                  "reference_urls": {
+                    "type": "array",
+                    "description": "参考图片 URL",
+                    "items": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "example": [
+                      "https://ark-project.tos-cn-beijing.volces.com/doc_image/i2v_foxrgirl.png"
+                    ]
+                  }
+                },
+                "required": [
+                  "aspect_ratio",
+                  "channel_option",
+                  "prompt",
+                  "resolution_option"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoTaskResponse"
+                },
+                "example": {
+                  "status": 100,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 17477,
+                    "status": "Running",
+                    "amount": "12"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/workflow/seedreamAiImage": {
       "post": {
         "summary": "图片生成-Seedream 5.0 Lite",
