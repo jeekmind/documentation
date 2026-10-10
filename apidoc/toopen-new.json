@@ -82,6 +82,45 @@
           }
         }
       },
+      "VideoEditingResultData": {
+        "type": "object",
+        "required": ["id", "status", "response_json"],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "任务的 ID 记录。",
+            "example": 376740
+          },
+          "status": {
+            "type": "string",
+            "enum": ["Running", "Success", "Failed"],
+            "description": "任务的状态。",
+            "example": "Success"
+          },
+          "response_json": {
+            "type": "string",
+            "description": "视频混剪结果，JSON 字符串。",
+            "example": "[\"https://oss.jeekmind.com/carimg/2baf3c/2026-10/0/jeekup_aiVideoCheck202610101703142665.mp4\"]"
+          },
+          "msg": {
+            "type": ["string", "null"],
+            "description": "失败时的错误信息，成功时为 null。",
+            "example": null
+          },
+          "amount": {
+            "type": "integer",
+            "description": "任务消耗的算力。",
+            "example": 0
+          }
+        },
+        "example": {
+          "id": 111111,
+          "status": "Success",
+          "response_json": "[\"https://oss.jeekmind.com/carimg/2baf3c/2026-10/0/jeekup_aiVideoCheck202610101703142665.mp4\"]",
+          "msg": null,
+          "amount": 0
+        }
+      },
       "ResultResponse": {
         "type": "object",
         "required": ["status", "message", "data"],
@@ -102,6 +141,10 @@
               {
                 "$ref": "#/components/schemas/VideoResultData",
                 "title": "视频生成结果"
+              },
+              {
+                "$ref": "#/components/schemas/VideoEditingResultData",
+                "title": "视频混剪结果"
               },
               {
                 "$ref": "#/components/schemas/SeedreamTaskData",
@@ -337,15 +380,34 @@
                   "$ref": "#/components/schemas/ResultResponse",
                   "title": "生成结果"
                 },
-                "example": {
-                  "status": 100,
-                  "message": "操作成功",
-                  "data": {
-                    "id": 376592,
-                    "status": "Success",
-                    "temporary_url": "https://ark-acg-beijing.tos-cn-beijing.volces.com/doubao-seedance-2-5/cgt-20260904165749-7pm5n.mp4",
-                    "msg": null,
-                    "amount": -4
+                "examples": {
+                  "成功-视频生成": {
+                    "summary": "视频生成",
+                    "value": {
+                      "status": 100,
+                      "message": "操作成功",
+                      "data": {
+                        "id": 376592,
+                        "status": "Success",
+                        "temporary_url": "https://ark-acg-beijing.tos-cn-beijing.volces.com/doubao-seedance-2-5/cgt-20260904165749-7pm5n.mp4",
+                        "msg": null,
+                        "amount": -4
+                      }
+                    }
+                  },
+                  "成功-视频混剪": {
+                    "summary": "视频混剪",
+                    "value": {
+                      "status": 100,
+                      "message": "操作成功",
+                      "data": {
+                        "id": 376740,
+                        "status": "Success",
+                        "response_json": "[\"https://oss.jeekmind.com/carimg/2baf3c/2026-10/0/jeekup_aiVideoCheck202610101703142665.mp4\"]",
+                        "msg": null,
+                        "amount": 0
+                      }
+                    }
                   }
                 }
               }
@@ -1316,6 +1378,70 @@
           }
         },
         "operationId": "createSeedanceAiVideo"
+      }
+    },
+    "/workflow/aiVideoCheck": {
+      "post": {
+        "x-mint": {
+          "href": "/openapi-ref/workflow/ai-video-check",
+          "metadata": {
+            "sidebarTitle": "视频混剪"
+          }
+        },
+        "summary": "视频混剪",
+        "description": "",
+        "tags": ["视频混剪"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "prompt": {
+                    "type": "string",
+                    "description": "文本提示词",
+                    "example": "直接合成"
+                  },
+                  "resolution_option": {
+                    "type": "integer",
+                    "description": "分辨率\n1：代表480p\n2：代表720p\n3：代表1080p",
+                    "example": 2
+                  },
+                  "reference_urls": {
+                    "type": "array",
+                    "description": "素材文件列表 URL",
+                    "example": [
+                      "https://oss.jeekmind.com/carimg/2baf3c/2026-10/0/jeekup_AiVideo202610101143354889.mp4"
+                    ],
+                    "items": { "type": "string", "format": "uri" }
+                  }
+                },
+                "required": ["prompt", "resolution_option", "reference_urls"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoTaskResponse"
+                },
+                "example": {
+                  "status": 100,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 17477,
+                    "status": "Running",
+                    "amount": "12"
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/workflow/aiVideo": {
