@@ -99,7 +99,7 @@
           },
           "response_json": {
             "type": "string",
-            "description": "视频混剪结果，JSON 字符串。",
+            "description": "视频剪辑结果，JSON 字符串。",
             "example": "[\"https://oss.jeekmind.com/carimg/2baf3c/2026-10/0/jeekup_aiVideoCheck202610101703142665.mp4\"]"
           },
           "msg": {
@@ -144,7 +144,7 @@
               },
               {
                 "$ref": "#/components/schemas/VideoEditingResultData",
-                "title": "视频混剪结果"
+                "title": "视频剪辑结果"
               },
               {
                 "$ref": "#/components/schemas/SeedreamTaskData",
@@ -395,8 +395,8 @@
                       }
                     }
                   },
-                  "成功-视频混剪": {
-                    "summary": "视频混剪",
+                  "成功-视频剪辑": {
+                    "summary": "视频剪辑",
                     "value": {
                       "status": 100,
                       "message": "操作成功",
@@ -1488,12 +1488,12 @@
         "x-mint": {
           "href": "/openapi-ref/workflow/ai-video-check",
           "metadata": {
-            "sidebarTitle": "视频混剪"
+            "sidebarTitle": "视频剪辑"
           }
         },
-        "summary": "视频混剪",
+        "summary": "视频剪辑",
         "description": "",
-        "tags": ["视频混剪"],
+        "tags": ["视频剪辑"],
         "requestBody": {
           "content": {
             "application/json": {
