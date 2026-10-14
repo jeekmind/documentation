@@ -79,6 +79,11 @@
           "last_frame_url": {
             "type": "string",
             "description": "最后一帧 URL"
+          },
+          "total_token": {
+            "type": "integer",
+            "description": "本次任务消耗的 Token。",
+            "example": 100
           }
         }
       },
