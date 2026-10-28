@@ -18,7 +18,7 @@
           },
           "status": {
             "type": "string",
-            "enum": ["Running", "Success", "Failed"],
+            "enum": ["Running", "Success", "Fail"],
             "description": "状态（Success：执行成功。Running：执行中。Fail：执行失败）",
             "example": "Running"
           },
@@ -59,8 +59,8 @@
           },
           "status": {
             "type": "string",
-            "enum": ["Running", "Success", "Failed"],
-            "description": "任务的状态。\nRunning 表示正在运行，\nSuccess 表示成功，\nFailed 表示失败。",
+            "enum": ["Running", "Success", "Fail"],
+            "description": "任务的状态。\nRunning 表示正在运行，\nSuccess 表示成功，\nFail 表示失败。",
             "example": "Success"
           },
           "amount": {
@@ -98,7 +98,7 @@
           },
           "status": {
             "type": "string",
-            "enum": ["Running", "Success", "Failed"],
+            "enum": ["Running", "Success", "Fail"],
             "description": "任务的状态。",
             "example": "Success"
           },
@@ -170,8 +170,8 @@
           },
           "status": {
             "type": "string",
-            "enum": ["Running", "Success", "Failed"],
-            "description": "任务的状态。\nRunning 表示正在运行，\nSuccess 表示成功，\nFailed 表示失败。",
+            "enum": ["Running", "Success", "Fail"],
+            "description": "任务的状态。\nRunning 表示正在运行，\nSuccess 表示成功，\nFail 表示失败。",
             "example": "Success"
           },
           "response_json": {
