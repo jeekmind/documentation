@@ -768,6 +768,129 @@
         }
       }
     },
+    "/v1/videos": {
+      "post": {
+        "x-mint": {
+          "href": "/openapi-ref/v1/videos",
+          "metadata": {
+            "sidebarTitle": "聚合模型"
+          }
+        },
+        "summary": "视频生成-聚合模型",
+        "description": "",
+        "tags": ["视频生成-聚合模型"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "duration": {
+                    "type": "integer",
+                    "description": "视频生成时长",
+                    "example": 4
+                  },
+                  "model": {
+                    "type": "string",
+                    "description": "模型名（直接传模型名称：\ngxc-doubao-seedance-2-0-720p-second，\ngxc-doubao-seedance-2-0-fast-720p-second，\nmetaso-MiniMax-H3，\njh-buming-seedance-2-0-official-480p，\ngxc-sd2.0-110，\ngxc-nv-seedance-2.5，\ngxc-wan3.0-video，\nmyu-wan3.0-video，\nmyu-wan3.0-video-prime，\ngxc-doubao-seedance-2-5-720p-second\n）",
+                    "example": "gxc-wan3.0-video"
+                  },
+                  "prompt": {
+                    "type": "string",
+                    "description": "提示词",
+                    "example": "生成一段科幻电影",
+                    "default": "生成一段科幻电影"
+                  },
+                  "ratio": {
+                    "type": "string",
+                    "description": "画面比例（16:9,\n9:16,\n1:1,\n4:3,\n3:4,\n21:9）",
+                    "example": "9:16"
+                  },
+                  "resolution": {
+                    "type": "string",
+                    "description": "分辨率（480p，\n720p，\n1080p，\n2K，\n3K，\n4K，\n768p，\n1440p）",
+                    "example": "720p"
+                  },
+                  "audio_urls": {
+                    "type": "array",
+                    "description": "参考音频链接列表",
+                    "example": []
+                  },
+                  "image_urls": {
+                    "type": "array",
+                    "description": "参考图片链接列表",
+                    "example": [
+                      "https://ark-project.tos-cn-beijing.volces.com/doc_image/i2v_foxrgirl.png"
+                    ]
+                  },
+                  "video_urls": {
+                    "type": "array",
+                    "description": "参考视频链接列表",
+                    "example": [
+                      "https://arkdocs.tos-cn-beijing.volces.com/videos/video-generation/seedance2.5_reference2.mp4"
+                    ]
+                  },
+                  "context_ir_enabled": {
+                    "type": "integer",
+                    "description": "是否开启提示词优化（0 否 1 是）【注意：当前值仅对MiniMax-H3 系列模型生效】",
+                    "example": 1
+                  },
+                  "generate_audio": {
+                    "type": "integer",
+                    "description": "是否生成音频（0 否 1 是）【注意：当前值仅针对doubao-seedance系列模型】",
+                    "example": 1
+                  },
+                  "priority": {
+                    "type": "integer",
+                    "description": "任务优先级（0 到 9，值越大，优先级越高）",
+                    "example": 9
+                  },
+                  "return_last_frame": {
+                    "type": "integer",
+                    "description": "是否返回最后一帧（0 否 1 是）【注意：当前值仅针对doubao-seedance系列模型】",
+                    "example": 1
+                  },
+                  "tools": {
+                    "type": "string",
+                    "description": "工具：【注意：当前值仅针对doubao-seedance系列模型】",
+                    "example": ""
+                  },
+                  "watermark": {
+                    "type": "integer",
+                    "description": "是否添加水印（0 否 1 是）【注意：当前值仅针对doubao-seedance系列模型】",
+                    "example": 1
+                  }
+                },
+                "required": [
+                  "duration",
+                  "model",
+                  "prompt",
+                  "ratio",
+                  "resolution"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoTaskResponse"
+                },
+                "example": {
+                  "status": 100,
+                  "message": "操作成功",
+                  "data": { "id": 2713472, "status": "Running", "amount": 21 }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/workflow/seedanceDiscountChannel1": {
       "post": {
         "x-mint": {
