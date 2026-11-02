@@ -792,7 +792,7 @@
                   },
                   "model": {
                     "type": "string",
-                    "description": "模型名（直接传模型名称：\ngxc-doubao-seedance-2-0-720p-second，\ngxc-doubao-seedance-2-0-fast-720p-second，\nmetaso-MiniMax-H3，\njh-buming-seedance-2-0-official-480p，\ngxc-sd2.0-110，\ngxc-nv-seedance-2.5，\ngxc-wan3.0-video，\nmyu-wan3.0-video，\nmyu-wan3.0-video-prime，\ngxc-doubao-seedance-2-5-720p-second\n）",
+                    "description": "模型名（直接传模型名称：\ngxc-doubao-seedance-2-0-720p-second，\ngxc-doubao-seedance-2-0-fast-720p-second，\nme-MiniMax-H3，\njh-buming-seedance-2-0-official-480p，\ngxc-sd2.0-110，\ngxc-nv-seedance-2.5，\ngxc-wan3.0-video，\nmyu-wan3.0-video，\nmyu-wan3.0-video-prime，\ngxc-doubao-seedance-2-5-720p-second\n）",
                     "example": "gxc-wan3.0-video"
                   },
                   "prompt": {
