@@ -1613,32 +1613,69 @@
     },
     "/workflow/videoClip": {
       "post": {
-        "x-target-id": "23cb7df2f7611d",
-        "x-protocol": "http",
-        "summary": "视频剪辑",
-        "description": "",
-        "tags": ["开放端-免加密/02、功能模块/智能混剪"],
-        "x-mock-server-enable": 1,
-        "x-mark-id": "2",
-        "x-updated-at": "2026-11-13T12:23:06+08:00",
-        "x-updated-user-name": "zhenfeng",
+        "x-mint": {
+          "href": "/openapi-ref/workflow/video-clip",
+          "metadata": {
+            "sidebarTitle": "视频剪辑 V2"
+          }
+        },
+        "summary": "视频剪辑 V2",
+        "description": "根据提示词生成剪辑结果，可输出视频或仅输出音频。",
+        "tags": ["视频剪辑 V2"],
         "requestBody": {
           "content": {
-            "multipart/form-data": {
+            "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
                   "prompt": {
                     "type": "string",
-                    "description": "提示词",
+                    "description": "文本提示词",
                     "example": "生成一段科幻电影",
                     "default": "生成一段科幻电影"
                   },
+                  "image_urls": {
+                    "type": "array",
+                    "description": "参考图片 URL 列表",
+                    "items": { "type": "string", "format": "uri" }
+                  },
+                  "video_urls": {
+                    "type": "array",
+                    "description": "参考视频 URL 列表",
+                    "items": { "type": "string", "format": "uri" }
+                  },
+                  "audio_urls": {
+                    "type": "array",
+                    "description": "参考音频 URL 列表",
+                    "items": { "type": "string", "format": "uri" }
+                  },
+                  "subtitle_urls": {
+                    "type": "array",
+                    "description": "字幕文件 URL 列表",
+                    "items": { "type": "string", "format": "uri" }
+                  },
                   "type": {
                     "type": "string",
-                    "description": "输出产物类型。可选值：\nvideo：（默认）输出视频。\naudio：仅输出音频。",
+                    "description": "输出产物类型。\nvideo：输出视频（默认）。\naudio：仅输出音频。",
+                    "enum": ["video", "audio"],
                     "example": "audio",
-                    "default": ""
+                    "default": "video"
+                  },
+                  "resolution": {
+                    "type": "string",
+                    "description": "分辨率（可以直接指定像素【360p、480p、720p、1080p、2k、4k】，也支持宽高格式【如 1920x1080】）"
+                  },
+                  "format": {
+                    "type": "string",
+                    "description": "输出封装格式。可选值：mp4（视频）、mp3（音频）。未填写时按 type 自动选择。"
+                  },
+                  "fps": {
+                    "type": "string",
+                    "description": "视频输出帧率，仅当 type=video 时生效。取值范围 [15,60]，默认 25"
+                  },
+                  "meta": {
+                    "type": "string",
+                    "description": "可选的输出元信息"
                   }
                 },
                 "required": ["prompt"]
@@ -1651,8 +1688,7 @@
             "description": "成功",
             "content": {
               "application/json": {
-                "schema": { "type": "object", "properties": {} },
-                "example": ""
+                "schema": { "type": "object" }
               }
             }
           },
@@ -1660,8 +1696,7 @@
             "description": "失败",
             "content": {
               "application/json": {
-                "schema": { "type": "object", "properties": {} },
-                "example": ""
+                "schema": { "type": "object" }
               }
             }
           }
