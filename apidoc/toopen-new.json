@@ -1611,6 +1611,63 @@
         "operationId": "createSeedanceAiVideo"
       }
     },
+    "/workflow/videoClip": {
+      "post": {
+        "x-target-id": "23cb7df2f7611d",
+        "x-protocol": "http",
+        "summary": "视频剪辑",
+        "description": "",
+        "tags": ["开放端-免加密/02、功能模块/智能混剪"],
+        "x-mock-server-enable": 1,
+        "x-mark-id": "2",
+        "x-updated-at": "2026-11-13T12:23:06+08:00",
+        "x-updated-user-name": "zhenfeng",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "prompt": {
+                    "type": "string",
+                    "description": "提示词",
+                    "example": "生成一段科幻电影",
+                    "default": "生成一段科幻电影"
+                  },
+                  "type": {
+                    "type": "string",
+                    "description": "输出产物类型。可选值：\nvideo：（默认）输出视频。\naudio：仅输出音频。",
+                    "example": "audio",
+                    "default": ""
+                  }
+                },
+                "required": ["prompt"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": {} },
+                "example": ""
+              }
+            }
+          },
+          "404": {
+            "description": "失败",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": {} },
+                "example": ""
+              }
+            }
+          }
+        }
+      }
+    },
     "/workflow/aiVideoCheck": {
       "post": {
         "x-mint": {
