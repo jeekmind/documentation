@@ -24,12 +24,6 @@
     "openapi": "apidoc/toopen-new.json",
     "playground": {
       "display": "interactive"
-    },
-    "examples": {
-      "languages": ["curl", "javascript", "python"],
-      "defaults": "required",
-      "prefill": true,
-      "autogenerate": true
     }
   },
   "navigation": {
