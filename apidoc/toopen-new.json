@@ -1,2346 +1,1788 @@
 {
-  "info": {
-    "title": "AI智能助手",
-    "description": "",
-    "version": "1.0.0"
-  },
-  "openapi": "3.1.0",
-  "components": {
-    "schemas": {
-      "VideoTaskData": {
-        "type": "object",
-        "required": ["id", "status", "amount"],
-        "properties": {
-          "id": {
-            "type": "integer",
-            "description": "任务的 ID 记录",
-            "example": 11
-          },
-          "status": {
-            "type": "string",
-            "enum": ["Running", "Success", "Fail"],
-            "description": "状态（Success：执行成功。Running：执行中。Fail：执行失败）",
-            "example": "Running"
-          },
-          "amount": {
-            "type": "number",
-            "description": "任务预计扣除算力",
-            "example": 100
-          }
-        }
-      },
-      "VideoTaskResponse": {
-        "type": "object",
-        "required": ["status", "message", "data"],
-        "properties": {
-          "status": {
-            "type": "integer",
-            "description": "状态码，100 表示成功，其他表示失败。",
-            "example": 100
-          },
-          "message": {
-            "type": "string",
-            "description": "操作结果的提示消息。",
-            "example": "操作成功"
-          },
-          "data": {
-            "$ref": "#/components/schemas/VideoTaskData"
-          }
-        }
-      },
-      "VideoResultData": {
-        "type": "object",
-        "required": ["id", "status"],
-        "properties": {
-          "id": {
-            "type": "integer",
-            "description": "任务的 ID 记录。",
-            "example": 20
-          },
-          "status": {
-            "type": "string",
-            "enum": ["Running", "Success", "Fail"],
-            "description": "任务的状态。\nRunning 表示正在运行，\nSuccess 表示成功，\nFail 表示失败。",
-            "example": "Success"
-          },
-          "amount": {
-            "type": "integer",
-            "description": "任务的消耗的算力，仅在 Success 后显示。",
-            "example": 100
-          },
-          "response_json": {
-            "type": "string",
-            "description": "执行结果内容。与 temporary_url 之间仅返回一个。"
-          },
-          "temporary_url": {
-            "type": "string",
-            "description": "结果。与 response_json 之间仅返回一个。"
-          },
-          "last_frame_url": {
-            "type": "string",
-            "description": "最后一帧 URL"
-          },
-          "total_token": {
-            "type": "integer",
-            "description": "本次任务消耗的 Token。",
-            "example": 100
-          }
-        }
-      },
-      "VideoEditingResultData": {
-        "type": "object",
-        "required": ["id", "status", "response_json"],
-        "properties": {
-          "id": {
-            "type": "integer",
-            "description": "任务的 ID 记录。",
-            "example": 376740
-          },
-          "status": {
-            "type": "string",
-            "enum": ["Running", "Success", "Fail"],
-            "description": "任务的状态。",
-            "example": "Success"
-          },
-          "response_json": {
-            "type": "string",
-            "description": "视频剪辑结果，JSON 字符串。",
-            "example": "[\"https://oss.jeekmind.com/carimg/2baf3c/2026-10/0/jeekup_aiVideoCheck202610101703142665.mp4\"]"
-          },
-          "msg": {
-            "type": ["string", "null"],
-            "description": "失败时的错误信息，成功时为 null。",
-            "example": null
-          },
-          "amount": {
-            "type": "integer",
-            "description": "任务消耗的算力。",
-            "example": 0
-          }
-        },
-        "example": {
-          "id": 111111,
-          "status": "Success",
-          "response_json": "[\"https://oss.jeekmind.com/carimg/2baf3c/2026-10/0/jeekup_aiVideoCheck202610101703142665.mp4\"]",
-          "msg": null,
-          "amount": 0
-        }
-      },
-      "ResultResponse": {
-        "type": "object",
-        "required": ["status", "message", "data"],
-        "properties": {
-          "status": {
-            "type": "integer",
-            "description": "响应状态码。",
-            "example": 100
-          },
-          "message": {
-            "type": "string",
-            "description": "响应消息。",
-            "example": "操作成功"
-          },
-          "data": {
-            "description": "任务的结果，有多种不同的类型。",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/VideoResultData",
-                "title": "视频生成结果"
-              },
-              {
-                "$ref": "#/components/schemas/VideoEditingResultData",
-                "title": "视频剪辑结果"
-              },
-              {
-                "$ref": "#/components/schemas/SeedreamTaskData",
-                "title": "Seedream 任务结果"
-              }
-            ]
-          }
-        }
-      },
-      "SeedreamTaskData": {
-        "type": "object",
-        "required": ["id", "status", "response_json"],
-        "properties": {
-          "id": {
-            "type": "integer",
-            "description": "任务的 ID 记录。",
-            "example": 376618
-          },
-          "status": {
-            "type": "string",
-            "enum": ["Running", "Success", "Fail"],
-            "description": "任务的状态。\nRunning 表示正在运行，\nSuccess 表示成功，\nFail 表示失败。",
-            "example": "Success"
-          },
-          "response_json": {
-            "type": "string",
-            "description": "执行结果内容，JSON 字符串。解析后为图片对象数组，每项包含 id（图片 ID）、url（图片访问地址）、status（success：生成成功）、error_message（失败原因）。",
-            "example": "[{\"id\": 494, \"url\": \"https://oss.jeekmind.com/carimg/2baf3c/2026-09/0/jeekup_images202609142128248742.png\", \"status\": \"success\", \"error_message\": \"\"}]"
-          },
-          "msg": {
-            "type": ["string", "null"],
-            "description": "失败时的错误信息，成功时为 null。",
-            "example": null
-          },
-          "amount": {
-            "type": "integer",
-            "description": "任务的消耗的算力，仅在 Success 后显示。",
-            "example": 100
-          }
-        }
-      }
-    },
-    "securitySchemes": {
-      "BearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT",
-        "description": "在 Authorization 请求头中传入带 Bearer 头的 API 密钥，例如：Bearer xxxxxx \n[如何获取 API 密钥？](/dev/open/get-bearer-token)"
-      }
-    }
-  },
-  "tags": [
-    {
-      "name": "视频生成",
-      "description": "AI 视频生成及结果查询接口"
-    },
-    {
-      "name": "临时储存",
-      "description": "临时文件上传接口"
-    },
-    {
-      "name": "视频生成-Seedance2.0（支持人脸）",
-      "description": "Seedance2.0（支持人脸）相关接口"
-    },
-    {
-      "name": "视频生成-Seedance 原价",
-      "description": "Seedance 原价相关接口"
-    },
-    {
-      "name": "视频生成-获取生成结果",
-      "description": "获取生成结果相关接口"
-    },
-    {
-      "name": "视频生成-谷歌 Omni",
-      "description": "谷歌 Omni相关接口"
-    },
-    {
-      "name": "视频生成-Seedance2.0 限时折扣（支持人脸）",
-      "description": "Seedance2.0 限时折扣（支持人脸）相关接口"
-    },
-    {
-      "name": "视频生成-Seedance2.0 体验1",
-      "description": "Seedance2.0 体验1相关接口"
-    },
-    {
-      "name": "视频生成-Seedance2.0 体验2",
-      "description": "Seedance2.0 体验2相关接口"
-    },
-    {
-      "name": "视频生成-Seedance2.0 体验3",
-      "description": "Seedance2.0 体验3相关接口"
-    },
-    {
-      "name": "Seedance 官方-素材库列表",
-      "description": "Seedance 官方-素材库列表相关接口"
-    },
-    {
-      "name": "Seedance 官方-上传素材",
-      "description": "Seedance 官方-上传素材相关接口"
-    },
-    {
-      "name": "Seedance 官方-删除素材",
-      "description": "Seedance 官方-删除素材相关接口"
-    },
-    {
-      "name": "Seedance 官方-更新素材名",
-      "description": "Seedance 官方-更新素材名相关接口"
-    },
-    {
-      "name": "Seedance 官方-获取素材审核结果",
-      "description": "Seedance 官方-获取素材审核结果相关接口"
-    }
-  ],
-  "paths": {
-    "/upload": {
-      "post": {
-        "summary": "上传文件",
-        "description": "支持上传：图片、视频与音频，只保存3小时。",
-        "x-mint": {
-          "href": "/openapi-ref/upload",
-          "content": "<Warning>上传后，文件只会保留 3 小时。</Warning>",
-          "metadata": {
-            "sidebarTitle": "上传文件"
-          }
-        },
-        "tags": ["临时储存"],
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
+    "info"      : {"title": "AI智能助手", "description": "", "version": "1.0.0"},
+    "openapi"   : "3.1.0",
+    "components": {
+        "schemas"        : {
+            "VideoTaskData"         : {
+                "type"      : "object",
+                "required"  : ["id", "status", "amount"],
                 "properties": {
-                  "file": {
-                    "type": "string",
-                    "description": "文件",
-                    "format": "binary"
-                  }
-                },
-                "required": ["file"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": ["status", "message", "data"],
-                  "properties": {
+                    "id"    : {"type": "integer", "description": "任务的 ID 记录", "example": 11},
                     "status": {
-                      "type": "integer",
-                      "example": 100
+                        "type"       : "string",
+                        "enum"       : ["Running", "Success", "Fail"],
+                        "description": "状态（Success：执行成功。Running：执行中。Fail：执行失败）",
+                        "example"    : "Running"
                     },
-                    "message": {
-                      "type": "string",
-                      "example": "操作成功"
+                    "amount": {"type": "number", "description": "任务预计扣除算力", "example": 100}
+                }
+            },
+            "VideoTaskResponse"     : {
+                "type"      : "object",
+                "required"  : ["status", "message", "data"],
+                "properties": {
+                    "status" : {"type": "integer", "description": "状态码，100 表示成功，其他表示失败。", "example": 100},
+                    "message": {"type": "string", "description": "操作结果的提示消息。", "example": "操作成功"},
+                    "data"   : {"$ref": "#/components/schemas/VideoTaskData"}
+                }
+            },
+            "VideoResultData"       : {
+                "type"      : "object",
+                "required"  : ["id", "status"],
+                "properties": {
+                    "id"            : {"type": "integer", "description": "任务的 ID 记录。", "example": 20},
+                    "status"        : {
+                        "type"       : "string",
+                        "enum"       : ["Running", "Success", "Fail"],
+                        "description": "任务的状态。\nRunning 表示正在运行，\nSuccess 表示成功，\nFail 表示失败。",
+                        "example"    : "Success"
                     },
-                    "data": {
-                      "type": "object",
-                      "required": ["full_url"],
-                      "properties": {
-                        "full_url": {
-                          "type": "string",
-                          "format": "uri",
-                          "example": ".../1785314758_65f4ec.mp4"
-                        }
-                      }
+                    "amount"        : {"type": "integer", "description": "任务的消耗的算力，仅在 Success 后显示。", "example": 100},
+                    "response_json" : {"type": "string", "description": "执行结果内容。与 temporary_url 之间仅返回一个。"},
+                    "temporary_url" : {"type": "string", "description": "结果。与 response_json 之间仅返回一个。"},
+                    "last_frame_url": {"type": "string", "description": "最后一帧 URL"},
+                    "total_token"   : {"type": "integer", "description": "本次任务消耗的 Token。", "example": 100}
+                }
+            },
+            "VideoEditingResultData": {
+                "type"      : "object",
+                "required"  : ["id", "status", "response_json"],
+                "properties": {
+                    "id"           : {"type": "integer", "description": "任务的 ID 记录。", "example": 376740},
+                    "status"       : {
+                        "type"       : "string",
+                        "enum"       : ["Running", "Success", "Fail"],
+                        "description": "任务的状态。",
+                        "example"    : "Success"
+                    },
+                    "response_json": {
+                        "type": "string",
+                        "description": "视频剪辑结果，JSON 字符串。",
+                        "example": "[\"https://oss.jeekmind.com/carimg/2baf3c/2026-10/0/jeekup_aiVideoCheck202610101703142665.mp4\"]"
+                    },
+                    "msg"          : {
+                        "type"       : ["string", "null"],
+                        "description": "失败时的错误信息，成功时为 null。",
+                        "example"    : null
+                    },
+                    "amount"       : {"type": "integer", "description": "任务消耗的算力。", "example": 0}
+                },
+                "example"   : {
+                    "id": 111111,
+                    "status": "Success",
+                    "response_json": "[\"https://oss.jeekmind.com/carimg/2baf3c/2026-10/0/jeekup_aiVideoCheck202610101703142665.mp4\"]",
+                    "msg": null,
+                    "amount": 0
+                }
+            },
+            "ResultResponse"        : {
+                "type"      : "object",
+                "required"  : ["status", "message", "data"],
+                "properties": {
+                    "status" : {"type": "integer", "description": "响应状态码。", "example": 100},
+                    "message": {"type": "string", "description": "响应消息。", "example": "操作成功"},
+                    "data"   : {
+                        "description": "任务的结果，有多种不同的类型。",
+                        "oneOf"      : [
+                            {"$ref": "#/components/schemas/VideoResultData",        "title": "视频生成结果"       },
+                            {"$ref": "#/components/schemas/VideoEditingResultData", "title": "视频剪辑结果"       },
+                            {"$ref": "#/components/schemas/SeedreamTaskData",       "title": "Seedream 任务结果"}
+                        ]
                     }
-                  }
-                },
-                "example": {
-                  "status": 100,
-                  "message": "操作成功",
-                  "data": {
-                    "full_url": ".../1785314758_65f4ec.mp4"
-                  }
                 }
-              }
-            }
-          },
-          "404": {
-            "description": "失败",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {}
-                }
-              }
-            }
-          }
-        },
-        "operationId": "uploadTemporaryFile"
-      }
-    },
-    "/workflow/getResult": {
-      "post": {
-        "x-mint": {
-          "href": "/openapi-ref/workflow/get-result",
-          "metadata": {
-            "sidebarTitle": "获取生成结果"
-          }
-        },
-        "summary": "获取生成结果",
-        "description": "",
-        "tags": ["获取生成结果"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
+            },
+            "SeedreamTaskData"      : {
+                "type"      : "object",
+                "required"  : ["id", "status", "response_json"],
                 "properties": {
-                  "id": {
-                    "type": "integer",
-                    "description": "会话ID",
-                    "example": 1
-                  }
-                },
-                "required": ["id"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResultResponse",
-                  "title": "生成结果"
-                },
-                "examples": {
-                  "成功-视频生成": {
-                    "summary": "视频生成",
-                    "value": {
-                      "status": 100,
-                      "message": "操作成功",
-                      "data": {
-                        "id": 376592,
-                        "status": "Success",
-                        "temporary_url": "https://ark-acg-beijing.tos-cn-beijing.volces.com/doubao-seedance-2-5/cgt-20260904165749-7pm5n.mp4",
-                        "msg": null,
-                        "amount": -4
-                      }
-                    }
-                  },
-                  "成功-视频剪辑": {
-                    "summary": "视频剪辑",
-                    "value": {
-                      "status": 100,
-                      "message": "操作成功",
-                      "data": {
-                        "id": 376740,
-                        "status": "Success",
-                        "response_json": "[\"https://oss.jeekmind.com/carimg/2baf3c/2026-10/0/jeekup_aiVideoCheck202610101703142665.mp4\"]",
-                        "msg": null,
-                        "amount": 0
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "operationId": "getVideoResult"
-      }
-    },
-    "/workflow/aiVideoParse": {
-      "post": {
-        "summary": "视频解析",
-        "x-mint": {
-          "href": "/openapi-ref/workflow/ai-video-parse",
-          "metadata": {
-            "sidebarTitle": "视频解析"
-          }
-        },
-        "tags": ["视频解析"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "file_url": {
-                    "type": "string",
-                    "description": "视频 URL",
-                    "example": "https://wenlv-debug.oss-cn-shenzhen.aliyuncs.com/carimg/2baf3c/2025-10/0//coze_AiVideo202510291126186944.mp4"
-                  }
-                },
-                "required": ["file_url"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VideoTaskResponse"
-                },
-                "example": {
-                  "status": 100,
-                  "message": "操作成功",
-                  "data": {
-                    "id": 17477,
-                    "status": "Running",
-                    "amount": "12"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/workflow/aiImage": {
-      "post": {
-        "x-mint": {
-          "href": "/openapi-ref/workflow/ai-image",
-          "metadata": {
-            "sidebarTitle": "通用图片生成"
-          }
-        },
-        "summary": "图片生成-通用图片生成",
-        "description": "",
-        "tags": ["图片生成-通用图片生成"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "aspect_ratio": {
-                    "type": "integer",
-                    "description": "画面比例（1:【16:9】。2:【9:16】。3:【1:1】。4:【4:3】。5:【3:4】）",
-                    "example": 3,
-                    "enum": [1, 2, 3, 4, 5]
-                  },
-                  "channel_option": {
-                    "type": "integer",
-                    "description": "渠道\n1:Mimage-渠道1\n2:Mimage-渠道2",
-                    "example": 1,
-                    "enum": [1, 2]
-                  },
-                  "prompt": {
-                    "type": "string",
-                    "description": "文本提示词",
-                    "example": "有关于莲花荷叶等其他元素的国画水墨风格，写意山水，风格像大师的发挥感，画面尽量饱满，画面体现廉政精神，不要有文字的出现"
-                  },
-                  "resolution_option": {
-                    "type": "integer",
-                    "description": "图像分辨率（1：720P\n2：1080P\n3：2K）",
-                    "example": 1,
-                    "enum": [1, 2, 3]
-                  },
-                  "quality": {
-                    "type": "integer",
-                    "description": "图像质量（1:'auto', \n2:'low', \n3:'medium', \n4:'high')",
-                    "example": 1,
-                    "enum": [1, 2, 3, 4]
-                  },
-                  "reference_urls": {
-                    "type": "array",
-                    "description": "参考图片 URL",
-                    "items": {
-                      "type": "string",
-                      "format": "uri"
+                    "id"           : {"type": "integer", "description": "任务的 ID 记录。", "example": 376618},
+                    "status"       : {
+                        "type"       : "string",
+                        "enum"       : ["Running", "Success", "Fail"],
+                        "description": "任务的状态。\nRunning 表示正在运行，\nSuccess 表示成功，\nFail 表示失败。",
+                        "example"    : "Success"
                     },
-                    "example": [
-                      "https://ark-project.tos-cn-beijing.volces.com/doc_image/i2v_foxrgirl.png"
-                    ]
-                  }
-                },
-                "required": [
-                  "aspect_ratio",
-                  "channel_option",
-                  "prompt",
-                  "resolution_option"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VideoTaskResponse"
-                },
-                "example": {
-                  "status": 100,
-                  "message": "操作成功",
-                  "data": {
-                    "id": 17477,
-                    "status": "Running",
-                    "amount": "12"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/workflow/seedreamAiImage": {
-      "post": {
-        "x-mint": {
-          "href": "/openapi-ref/workflow/seedream-ai-image",
-          "metadata": {
-            "sidebarTitle": "Seedream 5.0 Lite"
-          }
-        },
-        "summary": "图片生成-Seedream 5.0 Lite",
-        "description": "",
-        "tags": ["图片生成-Seedream 5.0 Lite"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "aspect_ratio": {
-                    "type": "integer",
-                    "description": "画面比例（1:【16:9】。2:【9:16】。3:【1:1】。4:【4:3】。5:【3:4】）",
-                    "example": 3,
-                    "enum": [1, 2, 3, 4, 5]
-                  },
-                  "channel_option": {
-                    "type": "integer",
-                    "description": "渠道（1 渠道一）",
-                    "example": 1,
-                    "enum": [1]
-                  },
-                  "n": {
-                    "type": "integer",
-                    "description": "输出图片数量：1~5",
-                    "example": 3,
-                    "minimum": 1,
-                    "maximum": 5
-                  },
-                  "prompt": {
-                    "type": "string",
-                    "description": "文本提示词",
-                    "example": "生成今年世界杯的宣传海报"
-                  },
-                  "resolution_option": {
-                    "type": "integer",
-                    "description": "分辨率\n3：2K，4：3K，5：4K",
-                    "example": 3,
-                    "enum": [3, 4, 5]
-                  },
-                  "reference_urls": {
-                    "type": "array",
-                    "description": "参考图片 URL",
-                    "items": {
-                      "type": "string",
-                      "format": "uri"
+                    "response_json": {
+                        "type": "string",
+                        "description": "执行结果内容，JSON 字符串。解析后为图片对象数组，每项包含 id（图片 ID）、url（图片访问地址）、status（success：生成成功）、error_message（失败原因）。",
+                        "example": "[{\"id\": 494, \"url\": \"https://oss.jeekmind.com/carimg/2baf3c/2026-09/0/jeekup_images202609142128248742.png\", \"status\": \"success\", \"error_message\": \"\"}]"
                     },
-                    "example": [
-                      "https://ark-project.tos-cn-beijing.volces.com/doc_image/i2v_foxrgirl.png"
-                    ]
-                  }
-                },
-                "required": [
-                  "aspect_ratio",
-                  "channel_option",
-                  "n",
-                  "prompt",
-                  "resolution_option"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VideoTaskResponse"
-                },
-                "example": {
-                  "status": 100,
-                  "message": "操作成功",
-                  "data": {
-                    "id": 17477,
-                    "status": "Running",
-                    "amount": "12"
-                  }
+                    "msg"          : {
+                        "type"       : ["string", "null"],
+                        "description": "失败时的错误信息，成功时为 null。",
+                        "example"    : null
+                    },
+                    "amount"       : {"type": "integer", "description": "任务的消耗的算力，仅在 Success 后显示。", "example": 100}
                 }
-              }
             }
-          }
-        }
-      }
-    },
-    "/workflow/seedanceLongAiVideo": {
-      "post": {
-        "summary": "seedance 2.5-官方",
-        "description": "",
-        "x-mint": {
-          "href": "/openapi-ref/workflow/seedance-long-ai-video",
-          "metadata": {
-            "sidebarTitle": "Seedance 2.5 官方"
-          }
         },
-        "tags": ["视频生成-Seedance 2.5 官方"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "model_option": {
-                    "type": "integer",
-                    "description": "模型选择（1 Seedance 2.5）",
-                    "enum": [1],
-                    "example": 1
-                  },
-                  "prompt": {
-                    "type": "string",
-                    "description": "提示词",
-                    "example": "生成一段科幻电影"
-                  },
-                  "resolution_option": {
-                    "type": "integer",
-                    "description": "分辨率（1：480p，2：720p）",
-                    "enum": [1, 2],
-                    "example": 1
-                  },
-                  "duration": {
-                    "type": "integer",
-                    "description": "时长(支持 4 - 30 秒)",
-                    "example": 4,
-                    "minimum": 4,
-                    "maximum": 30
-                  },
-                  "aspect_ratio": {
-                    "type": "integer",
-                    "description": "画面比例（\n1：【16:9】，2：【9:16】，3：【1:1】，4：【4:3】，5：【3:4】）",
-                    "enum": [1, 2, 3, 4, 5],
-                    "example": 4
-                  },
-                  "reference_urls": {
-                    "type": "array",
-                    "description": "参考图/视频/音频视频:（仅支持mp4、mov格式，分辨率480P、、720P，时长2-15s(总时长不超过15s)，单视频不超过50MB;\n图片:单图小于30MB(总大小不超过64MB)\n音频:仅支持wav、mp3格式，时长2-15s，单个音频不超过15MB;）",
-                    "items": {
-                      "oneOf": [
-                        {
-                          "type": "integer",
-                          "description": "素材库资源 ID"
-                        },
-                        {
-                          "type": "string",
-                          "format": "uri",
-                          "description": "资源 URL"
+        "securitySchemes": {
+            "BearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "在 Authorization 请求头中传入带 Bearer 头的 API 密钥，例如：Bearer xxxxxx \n[如何获取 API 密钥？](/dev/open/get-bearer-token)"
+            }
+        }
+    },
+    "tags"      : [
+        {"name": "视频生成",                        "description": "AI 视频生成及结果查询接口"            },
+        {"name": "临时储存",                        "description": "临时文件上传接口"                  },
+        {"name": "视频生成-Seedance2.0（支持人脸）",      "description": "Seedance2.0（支持人脸）相关接口"     },
+        {"name": "视频生成-Seedance 原价",            "description": "Seedance 原价相关接口"           },
+        {"name": "视频生成-获取生成结果",                 "description": "获取生成结果相关接口"                },
+        {"name": "视频生成-谷歌 Omni",                "description": "谷歌 Omni相关接口"               },
+        {"name": "视频生成-Seedance2.0 限时折扣（支持人脸）", "description": "Seedance2.0 限时折扣（支持人脸）相关接口"},
+        {"name": "视频生成-Seedance2.0 体验1",        "description": "Seedance2.0 体验1相关接口"       },
+        {"name": "视频生成-Seedance2.0 体验2",        "description": "Seedance2.0 体验2相关接口"       },
+        {"name": "视频生成-Seedance2.0 体验3",        "description": "Seedance2.0 体验3相关接口"       },
+        {"name": "Seedance 官方-素材库列表",           "description": "Seedance 官方-素材库列表相关接口"     },
+        {"name": "Seedance 官方-上传素材",            "description": "Seedance 官方-上传素材相关接口"      },
+        {"name": "Seedance 官方-删除素材",            "description": "Seedance 官方-删除素材相关接口"      },
+        {"name": "Seedance 官方-更新素材名",           "description": "Seedance 官方-更新素材名相关接口"     },
+        {"name": "Seedance 官方-获取素材审核结果",        "description": "Seedance 官方-获取素材审核结果相关接口"  }
+    ],
+    "paths"     : {
+        "/upload": {
+            "post": {
+                "summary"    : "上传文件",
+                "description": "支持上传：图片、视频与音频，只保存3小时。",
+                "x-mint"     : {
+                    "href"    : "/openapi-ref/upload",
+                    "content" : "<Warning>上传后，文件只会保留 3 小时。</Warning>",
+                    "metadata": {"sidebarTitle": "上传文件"}
+                },
+                "tags"       : ["临时储存"],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type"      : "object",
+                                "properties": { "file": {"type": "string", "description": "文件", "format": "binary"} },
+                                "required"  : ["file"]
+                            }
                         }
-                      ]
-                    },
-                    "example": []
-                  },
-                  "omni_reference_task_type": {
-                    "type": "string",
-                    "description": "模式\n默认值auto\nauto：由模型根据输入素材和提示词自动判定任务类型\nreference：全能参考\nedit：视频编辑（**当模式为视频编辑时，duration 时长不需要，输入会被自动忽略。**）\nextend：视频延长",
-                    "enum": ["auto", "reference", "edit", "extend"],
-                    "example": "auto",
-                    "default": "auto"
-                  }
-                },
-                "required": ["prompt", "resolution_option", "aspect_ratio"],
-                "allOf": [
-                  {
-                    "if": {
-                      "properties": {
-                        "omni_reference_task_type": {
-                          "const": "edit"
-                        }
-                      }
-                    },
-                    "then": {},
-                    "else": {
-                      "required": ["duration"]
                     }
-                  }
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VideoTaskResponse"
                 },
-                "example": {
-                  "status": 100,
-                  "message": "操作成功",
-                  "data": { "id": 11, "status": "Running", "amount": 100 }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/videos": {
-      "post": {
-        "x-mint": {
-          "href": "/openapi-ref/v1/videos",
-          "metadata": {
-            "sidebarTitle": "聚合模型"
-          }
-        },
-        "summary": "视频生成-聚合模型",
-        "description": "",
-        "tags": ["视频生成-聚合模型"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "duration": {
-                    "type": "integer",
-                    "description": "视频生成时长",
-                    "example": 4
-                  },
-                  "model": {
-                    "type": "string",
-                    "description": "模型名（直接传模型名称：\ngxc-doubao-seedance-2-0-720p-second，\ngxc-doubao-seedance-2-0-fast-720p-second，\nme-MiniMax-H3，\njh-buming-seedance-2-0-official-480p，\ngxc-sd2.0-110，\ngxc-nv-seedance-2.5，\ngxc-wan3.0-video，\nmyu-wan3.0-video，\nmyu-wan3.0-video-prime，\ngxc-doubao-seedance-2-5-720p-second\n）",
-                    "example": "gxc-wan3.0-video"
-                  },
-                  "prompt": {
-                    "type": "string",
-                    "description": "提示词",
-                    "example": "生成一段科幻电影",
-                    "default": "生成一段科幻电影"
-                  },
-                  "ratio": {
-                    "type": "string",
-                    "description": "画面比例（16:9,\n9:16,\n1:1,\n4:3,\n3:4,\n21:9）",
-                    "example": "9:16"
-                  },
-                  "resolution": {
-                    "type": "string",
-                    "description": "分辨率（480p，\n720p，\n1080p，\n2K，\n3K，\n4K，\n768p，\n1440p）",
-                    "example": "720p"
-                  },
-                  "audio_urls": {
-                    "type": "array",
-                    "description": "参考音频链接列表",
-                    "example": []
-                  },
-                  "image_urls": {
-                    "type": "array",
-                    "description": "参考图片链接列表",
-                    "example": [
-                      "https://ark-project.tos-cn-beijing.volces.com/doc_image/i2v_foxrgirl.png"
-                    ]
-                  },
-                  "video_urls": {
-                    "type": "array",
-                    "description": "参考视频链接列表",
-                    "example": [
-                      "https://arkdocs.tos-cn-beijing.volces.com/videos/video-generation/seedance2.5_reference2.mp4"
-                    ]
-                  },
-                  "context_ir_enabled": {
-                    "type": "integer",
-                    "description": "是否开启提示词优化（0 否 1 是）【注意：当前值仅对MiniMax-H3 系列模型生效】",
-                    "example": 1
-                  },
-                  "generate_audio": {
-                    "type": "integer",
-                    "description": "是否生成音频（0 否 1 是）【注意：当前值仅针对doubao-seedance系列模型】",
-                    "example": 1
-                  },
-                  "priority": {
-                    "type": "integer",
-                    "description": "任务优先级（0 到 9，值越大，优先级越高）",
-                    "example": 9
-                  },
-                  "return_last_frame": {
-                    "type": "integer",
-                    "description": "是否返回最后一帧（0 否 1 是）【注意：当前值仅针对doubao-seedance系列模型】",
-                    "example": 1
-                  },
-                  "tools": {
-                    "type": "string",
-                    "description": "工具：【注意：当前值仅针对doubao-seedance系列模型】",
-                    "example": ""
-                  },
-                  "watermark": {
-                    "type": "integer",
-                    "description": "是否添加水印（0 否 1 是）【注意：当前值仅针对doubao-seedance系列模型】",
-                    "example": 1
-                  }
-                },
-                "required": [
-                  "duration",
-                  "model",
-                  "prompt",
-                  "ratio",
-                  "resolution"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VideoTaskResponse"
-                },
-                "example": {
-                  "status": 100,
-                  "message": "操作成功",
-                  "data": { "id": 2713472, "status": "Running", "amount": 21 }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/workflow/seedanceDiscountChannel1": {
-      "post": {
-        "x-mint": {
-          "href": "/openapi-ref/workflow/seedance-discount-channel1",
-          "metadata": {
-            "sidebarTitle": "Seedance 体验1"
-          }
-        },
-        "summary": "Seedance 体验1",
-        "description": "",
-        "tags": ["视频生成-Seedance 体验1"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "prompt": {
-                    "type": "string",
-                    "description": "提示词",
-                    "example": "生成一段科幻世界的视频",
-                    "default": ""
-                  },
-                  "aspect_ratio": {
-                    "type": "integer",
-                    "description": "画面比例\n1:【16:9】\n2:【9:16】\n3:【1:1】",
-                    "example": 2,
-                    "enum": [1, 2, 3]
-                  },
-                  "model_option": {
-                    "type": "integer",
-                    "description": "模型\n6：满血稳定-支持人脸-9 图 3 视频 3 音频\n7：满血-支持人脸-9 图 3 视频 3 音频",
-                    "example": 6,
-                    "enum": [6, 7]
-                  },
-                  "resolution_option": {
-                    "type": "integer",
-                    "description": "分辨率\n1：代表480p\n2：代表720p\n3：代表1080p \n4：代表4k\n\n\n模型6支持：2\n模型7支持：2",
-                    "example": 2,
-                    "enum": [2]
-                  },
-                  "reference_urls": {
-                    "type": "array",
-                    "description": "参考素材 \n模型6：支持9参考图、3参考视频、3参考音频\n模型7：支持9参考图、3参考视频、3参考音频",
-                    "items": {
-                      "type": "string",
-                      "format": "uri"
-                    },
-                    "example": []
-                  },
-                  "duration": {
-                    "type": "integer",
-                    "description": "生成视频时长（秒）",
-                    "example": 15
-                  }
-                },
-                "required": [
-                  "prompt",
-                  "aspect_ratio",
-                  "model_option",
-                  "resolution_option",
-                  "duration"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VideoTaskResponse"
-                },
-                "example": {
-                  "status": 100,
-                  "message": "操作成功",
-                  "data": {
-                    "id": 11,
-                    "status": "Running",
-                    "amount": 100
-                  }
-                }
-              }
-            }
-          }
-        },
-        "operationId": "createSeedanceExperience1Video"
-      }
-    },
-    "/workflow/seedanceDiscountChannel2": {
-      "post": {
-        "summary": "视频生成-Seedance 体验 2",
-        "description": "",
-        "x-mint": {
-          "href": "/openapi-ref/workflow/seedance-discount-channel2",
-          "metadata": {
-            "sidebarTitle": "Seedance 体验2"
-          }
-        },
-        "tags": ["视频生成-Seedance 体验2"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "aspect_ratio": {
-                    "type": "integer",
-                    "description": "画面比例\n1:【16:9】\n2:【9:16】\n3:【1:1】\n4:【4:3】\n5:【3:4】",
-                    "example": 2,
-                    "default": 2
-                  },
-                  "duration": {
-                    "type": "integer",
-                    "description": "时长\n\n2.5支持 4-30s\n2.0支持 4-15s",
-                    "example": 15,
-                    "minimum": 4,
-                    "maximum": 30
-                  },
-                  "model_option": {
-                    "type": "integer",
-                    "description": "模型\n(1：官方优惠 - Seedance2.0满血 - 支持人脸；\n2：官方优惠 - Seedance2.0fast - 支持人脸；\n3：官方优惠 - Seedance2.5 - 支持人脸；\n4：Seedance2.5 - 支持人脸\n)",
-                    "example": 1,
-                    "enum": [1, 2, 3, 4]
-                  },
-                  "priority": {
-                    "type": "integer",
-                    "description": "优先级（0到9）",
-                    "example": 1,
-                    "minimum": 1,
-                    "maximum": 9
-                  },
-                  "prompt": {
-                    "type": "string",
-                    "description": "提示词",
-                    "example": "生成一段科幻世界的视频",
-                    "default": "生成一段科幻电影"
-                  },
-                  "resolution_option": {
-                    "type": "integer",
-                    "description": "分辨率\n1：代表480p\n2：代表720p\n3：代表1080p \n4：代表2K\n5：代表3K\n6：代表4k\n\n\n模型3支持：2",
-                    "example": 2,
-                    "default": 2,
-                    "enum": [1, 2, 3, 4, 5, 6]
-                  },
-                  "return_last_frame": {
-                    "type": "integer",
-                    "description": "是否返回最后一帧【0 否 1 是】（默认：0）",
-                    "default": 0,
-                    "example": 0,
-                    "enum": [0, 1]
-                  },
-                  "watermark": {
-                    "type": "integer",
-                    "description": "是否关闭水印【0 否 1 是】（默认：1）",
-                    "default": 1,
-                    "example": 1,
-                    "enum": [0, 1]
-                  },
-                  "generate_audio": {
-                    "type": "integer",
-                    "description": "是否生成音频【0 否 1 是】（默认0)",
-                    "default": 0,
-                    "example": 0,
-                    "enum": [0, 1]
-                  },
-                  "tools": {
-                    "type": "array",
-                    "description": "工具",
-                    "example": [{ "type": "web_search" }]
-                  },
-                  "reference_urls": {
-                    "type": "array",
-                    "description": "2.5支持30图10音频10视频",
-                    "items": {
-                      "oneOf": [
-                        {
-                          "type": "integer",
-                          "description": "素材库资源 ID"
-                        },
-                        {
-                          "type": "string",
-                          "format": "uri",
-                          "description": "资源 URL"
+                "responses"  : {
+                    "200": {
+                        "description": "成功",
+                        "content"    : {
+                            "application/json": {
+                                "schema" : {
+                                    "type"      : "object",
+                                    "required"  : ["status", "message", "data"],
+                                    "properties": {
+                                        "status" : {"type": "integer", "example": 100},
+                                        "message": {"type": "string", "example": "操作成功"},
+                                        "data"   : {
+                                            "type"      : "object",
+                                            "required"  : ["full_url"],
+                                            "properties": {
+                                                "full_url": {
+                                                    "type"   : "string",
+                                                    "format" : "uri",
+                                                    "example": ".../1785314758_65f4ec.mp4"
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "status" : 100,
+                                    "message": "操作成功",
+                                    "data"   : {"full_url": ".../1785314758_65f4ec.mp4"}
+                                }
+                            }
                         }
-                      ]
                     },
-                    "example": []
-                  }
-                },
-                "required": [
-                  "aspect_ratio",
-                  "duration",
-                  "model_option",
-                  "prompt",
-                  "resolution_option"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VideoTaskResponse"
-                },
-                "example": {
-                  "status": 100,
-                  "message": "操作成功",
-                  "data": {
-                    "id": 11,
-                    "status": "Running",
-                    "amount": 100
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/workflow/seedanceDiscountChannel3": {
-      "post": {
-        "x-mint": {
-          "href": "/openapi-ref/workflow/seedance-discount-channel3",
-          "metadata": {
-            "sidebarTitle": "Seedance 体验3"
-          }
-        },
-        "summary": "Seedance 体验3",
-        "description": "",
-        "tags": ["视频生成-Seedance 体验3"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "prompt": {
-                    "type": "string",
-                    "description": "提示词",
-                    "example": "全程使用视频1的第一视角构图，全程使用音频1作为背景音乐。第一人称视角果茶宣传广告，seedance牌「苹苹安安」苹果果茶限定款；首帧为图片1，你的手摘下一颗带晨露的阿克苏红苹果，轻脆的苹果碰撞声；2-4 秒：第一人称手持举杯，你将图片2中的果茶举到镜头前（模拟递到观众面前的视角），杯身标签清晰可见，背景音「来一口鲜爽」，尾帧定格为图片2。背景声音统一为女生音色。",
-                    "default": ""
-                  },
-                  "aspect_ratio": {
-                    "type": "integer",
-                    "description": "画面比例\n1:【16:9】\n2:【9:16】\n3:【1:1】\n4:【3:4】\n5:【4:3】",
-                    "example": 2,
-                    "enum": [1, 2, 3, 4, 5]
-                  },
-                  "model_option": {
-                    "type": "integer",
-                    "description": "模型选择\n3：Seedance2.0-满血-支持人脸",
-                    "example": 3,
-                    "enum": [3]
-                  },
-                  "resolution_option": {
-                    "type": "integer",
-                    "description": "分辨率\n2：720p \n3：1080p\n\n模型3：支持3",
-                    "example": 3,
-                    "enum": [3]
-                  },
-                  "duration": {
-                    "type": "integer",
-                    "description": "生成视频时长（4–15 秒）",
-                    "minimum": 4,
-                    "maximum": 15,
-                    "example": 15
-                  },
-                  "reference_urls": {
-                    "type": "array",
-                    "description": "参考素材\n模型3：支持9参考图、3参考视频、3参考音频\n",
-                    "items": {
-                      "type": "string",
-                      "format": "uri"
-                    },
-                    "example": []
-                  }
-                },
-                "required": [
-                  "prompt",
-                  "aspect_ratio",
-                  "model_option",
-                  "resolution_option",
-                  "duration"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VideoTaskResponse"
-                },
-                "example": {
-                  "status": 100,
-                  "message": "操作成功",
-                  "data": {
-                    "id": 11,
-                    "status": "Running",
-                    "amount": 100
-                  }
-                }
-              }
-            }
-          }
-        },
-        "operationId": "createSeedanceExperience3Video"
-      }
-    },
-    "/workflow/seedanceDiscountChannel6": {
-      "post": {
-        "x-mint": {
-          "href": "/openapi-ref/workflow/seedance-discount-channel6",
-          "metadata": {
-            "sidebarTitle": "MiniMax"
-          }
-        },
-        "summary": "MiniMax",
-        "description": "",
-        "tags": ["视频生成-MiniMax"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "aspect_ratio": {
-                    "type": "integer",
-                    "description": "画面比例\n1:【16:9】\n2:【9:16】\n3:【1:1】\n4:【3:4】\n5:【4:3】",
-                    "example": 2,
-                    "enum": [1, 2, 3, 4, 5]
-                  },
-                  "duration": {
-                    "type": "integer",
-                    "description": "生成视频时长",
-                    "example": 4,
-                    "minimum": 4,
-                    "maximum": 15
-                  },
-                  "model_option": {
-                    "type": "integer",
-                    "description": "模型选择。请使用 `1`",
-                    "example": 1,
-                    "enum": [1]
-                  },
-                  "prompt": {
-                    "type": "string",
-                    "description": "提示词",
-                    "example": "全程使用视频1的第一视角构图，全程使用音频1作为背景音乐。第一人称视角果茶宣传广告，seedance牌「苹苹安安」苹果果茶限定款；首帧为图片1，你的手摘下一颗带晨露的阿克苏红苹果，轻脆的苹果碰撞声；2-4 秒：第一人称手持举杯，你将图片2中的果茶举到镜头前（模拟递到观众面前的视角），杯身标签清晰可见，背景音「来一口鲜爽」，尾帧定格为图片2。背景声音统一为女生音色。",
-                    "default": ""
-                  },
-                  "resolution_option": {
-                    "type": "integer",
-                    "description": "图像分辨率\n4：2K、\n5：3K、\n6：4K、\n7：768p、\n8：1440p",
-                    "example": 4,
-                    "enum": [4, 5, 6, 7, 8]
-                  },
-                  "context_ir_enabled": {
-                    "type": "boolean",
-                    "description": "是否开启提示词优化（true ：开启，false ：关闭）默认开启",
-                    "default": true,
-                    "example": true
-                  },
-                  "reference_urls": {
-                    "type": "array",
-                    "description": "参考素材",
-                    "items": {
-                      "type": "string",
-                      "format": "uri"
-                    },
-                    "example": [
-                      "https://ark-project.tos-cn-beijing.volces.com/doc_image/i2v_foxrgirl.png"
-                    ]
-                  }
-                },
-                "required": [
-                  "aspect_ratio",
-                  "duration",
-                  "model_option",
-                  "prompt",
-                  "resolution_option"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VideoTaskResponse"
-                },
-                "example": {
-                  "status": 100,
-                  "message": "操作成功",
-                  "data": {
-                    "id": 11,
-                    "status": "Running",
-                    "amount": 100
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/workflow/seedanceDiscount": {
-      "post": {
-        "x-mint": {
-          "href": "/openapi-ref/workflow/seedance-discount",
-          "metadata": {
-            "sidebarTitle": "Seedance 限时折扣（支持人脸）"
-          }
-        },
-        "summary": "Seedance 限时折扣（支持人脸）",
-        "description": "",
-        "tags": ["视频生成-Seedance 限时折扣（支持人脸）"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "prompt": {
-                    "type": "string",
-                    "description": "文本提示词",
-                    "example": "景别：中景\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\n表演/动作：先回头微笑，再自然挥手。\n镜头建议：镜头稳定，中景构图保留建筑背景。",
-                    "default": "景别：中景\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\n表演/动作：先回头微笑，再自然挥手。\n镜头建议：镜头稳定，中景构图保留建筑背景。"
-                  },
-                  "resolution_option": {
-                    "type": "integer",
-                    "description": "分辨率\n1：代表 480P\n2：代表 720P\n3：代表 1080P",
-                    "example": 1,
-                    "enum": [1, 2, 3]
-                  },
-                  "duration": {
-                    "type": "integer",
-                    "description": "时长",
-                    "example": 5
-                  },
-                  "aspect_ratio": {
-                    "type": "integer",
-                    "description": "画面比例\n1：代表【16:9】\n2：代表【9:16】\n3：代表【1:1】\n4：代表【4:3】\n5：代表【3:4】",
-                    "example": 3,
-                    "enum": [1, 2, 3, 4, 5]
-                  },
-                  "reference_urls": {
-                    "type": "array",
-                    "description": "参考图/视频/音频\n\n支持9参考图、3参考视频、3参考音频。\n\n视频：仅支持mp4、mov格式，分辨率480P、720P，时长2-15s，单视频不超过50MB;\n图片：单图小于30MB(总大小不超过64MB)\n音频：仅支持wav、mp3格式，时长2-15s，单个音频不超过15MB;",
-                    "items": {
-                      "oneOf": [
-                        {
-                          "type": "integer",
-                          "description": "素材库资源 ID，字符类型必须是整形。"
-                        },
-                        {
-                          "type": "string",
-                          "format": "uri",
-                          "description": "资源 URL"
+                    "404": {
+                        "description": "失败",
+                        "content"    : {
+                            "application/json": { "schema": {"type": "object", "properties": {}} }
                         }
-                      ]
-                    },
-                    "example": []
-                  }
-                },
-                "required": [
-                  "prompt",
-                  "resolution_option",
-                  "duration",
-                  "aspect_ratio"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VideoTaskResponse"
-                },
-                "example": {
-                  "status": 100,
-                  "message": "操作成功",
-                  "data": {
-                    "id": 11,
-                    "status": "Running",
-                    "amount": 100
-                  }
-                }
-              }
-            }
-          }
-        },
-        "operationId": "createSeedanceDiscountVideo"
-      }
-    },
-    "/workflow/liveAiVideo": {
-      "post": {
-        "x-mint": {
-          "href": "/openapi-ref/workflow/live-ai-video",
-          "metadata": {
-            "sidebarTitle": "Seedance（支持人脸）"
-          }
-        },
-        "summary": "Seedance（支持人脸）",
-        "description": "",
-        "tags": ["视频生成-Seedance（支持人脸）"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "prompt": {
-                    "type": "string",
-                    "description": "文本提示词",
-                    "example": "景别：中景\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\n表演/动作：先回头微笑，再自然挥手。\n镜头建议：镜头稳定，中景构图保留建筑背景。",
-                    "default": "景别：中景\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\n表演/动作：先回头微笑，再自然挥手。\n镜头建议：镜头稳定，中景构图保留建筑背景。"
-                  },
-                  "resolution_option": {
-                    "type": "integer",
-                    "description": "分辨率\n1：480P（支持模型：全部模型）\n2：720P（支持模型：全部模型）\n3：1080P（支持模型：真人版-视频生成）",
-                    "example": 1,
-                    "default": 1,
-                    "enum": [1, 2, 3]
-                  },
-                  "duration": {
-                    "type": "integer",
-                    "description": "时长",
-                    "example": 5,
-                    "default": 5
-                  },
-                  "aspect_ratio": {
-                    "type": "integer",
-                    "description": "画面比例\n1:【16:9】\n2:【9:16】\n3:【1:1】\n4:【4:3】\n5:【3:4】",
-                    "example": 3,
-                    "default": 3,
-                    "enum": [1, 2, 3, 4, 5]
-                  },
-                  "channel_option": {
-                    "type": "integer",
-                    "description": "渠道\n1：真人版-视频生成\n2：真人版-视频生成-fast\n3：真人版-视频生成-mini",
-                    "example": 1,
-                    "default": 1,
-                    "enum": [1, 2, 3]
-                  },
-                  "reference_urls": {
-                    "type": "array",
-                    "description": "参考图/视频/音频视频:（仅支持mp4、mov格式，分辨率480P、、720P，时长2-15s(总时长不超过15s)，单视频不超过50MB;\n图片:单图小于30MB(总大小不超过64MB)\n音频:仅支持wav、mp3格式，时长2-15s，单个音频不超过15MB;）",
-                    "items": {
-                      "oneOf": [
-                        {
-                          "type": "integer",
-                          "description": "素材库资源 ID"
-                        },
-                        {
-                          "type": "string",
-                          "format": "uri",
-                          "description": "资源 URL"
-                        }
-                      ]
-                    },
-                    "example": []
-                  }
-                },
-                "required": [
-                  "prompt",
-                  "resolution_option",
-                  "duration",
-                  "aspect_ratio",
-                  "channel_option"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VideoTaskResponse"
-                },
-                "example": {
-                  "status": 100,
-                  "message": "操作成功",
-                  "data": {
-                    "id": 11,
-                    "status": "Running",
-                    "amount": 100
-                  }
-                }
-              }
-            }
-          }
-        },
-        "operationId": "createLiveAiVideo"
-      }
-    },
-    "/workflow/seedanceAiVideo": {
-      "post": {
-        "x-mint": {
-          "href": "/openapi-ref/workflow/seedance-ai-video",
-          "metadata": {
-            "sidebarTitle": "Seedance 原价"
-          }
-        },
-        "summary": "Seedance 原价",
-        "description": "",
-        "tags": ["视频生成-Seedance 原价"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "prompt": {
-                    "type": "string",
-                    "description": "提示词，长度不超过800个字。",
-                    "example": ""
-                  },
-                  "resolution_option": {
-                    "type": "integer",
-                    "enum": [1, 2, 3],
-                    "description": "分辨率\n1：480P（支持模型：全部模型）\n2：720P（支持模型：全部模型）\n3：1080P（支持模型：生成视频-即梦seedance2.0满血）"
-                  },
-                  "duration": {
-                    "type": "integer"
-                  },
-                  "aspect_ratio": {
-                    "type": "integer",
-                    "enum": [1, 2, 3, 4, 5],
-                    "description": "画面比例\n1：16:9\n2：9:16\n3：1:1\n4：4:3\n5：3:4",
-                    "example": 1
-                  },
-                  "reference_urls": {
-                    "type": "array",
-                    "description": "参考图/视频/音频视频:（仅支持mp4、mov格式，分辨率480P、、720P，时长2-15s(总时长不超过15s)，单视频不超过50MB;\n图片:单图小于30MB(总大小不超过64MB)\n音频:仅支持wav、mp3格式，时长2-15s，单个音频不超过15MB;）",
-                    "items": {
-                      "oneOf": [
-                        {
-                          "type": "integer",
-                          "description": "素材库资源 ID"
-                        },
-                        {
-                          "type": "string",
-                          "format": "uri",
-                          "description": "资源 URL"
-                        }
-                      ]
                     }
-                  },
-                  "channel_option": {
-                    "type": "integer",
-                    "enum": [1, 3, 4],
-                    "description": "渠道\n1：生成视频-即梦seedance2.0 满血\n3：生成视频-即梦seedance2.0-mini\n4：生成视频-即梦seedance2.0-mini",
-                    "example": 4
-                  }
                 },
-                "required": [
-                  "prompt",
-                  "resolution_option",
-                  "duration",
-                  "aspect_ratio",
-                  "reference_urls",
-                  "channel_option"
-                ]
-              },
-              "example": {
-                "prompt": "景别：中景\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\n表演/动作：先回头微笑，再自然挥手。\n镜头建议：镜头稳定，中景构图保留建筑背景。",
-                "resolution_option": 1,
-                "duration": 5,
-                "aspect_ratio": 3,
-                "reference_urls": [],
-                "channel_option": 1
-              }
+                "operationId": "uploadTemporaryFile"
             }
-          }
         },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VideoTaskResponse"
-                },
-                "example": {
-                  "status": 100,
-                  "message": "操作成功",
-                  "data": {
-                    "id": 11,
-                    "status": "Running",
-                    "amount": 100
-                  }
-                }
-              }
-            }
-          }
-        },
-        "operationId": "createSeedanceAiVideo"
-      }
-    },
-    "/workflow/videoClip": {
-      "post": {
-        "x-mint": {
-          "href": "/openapi-ref/workflow/video-clip",
-          "metadata": {
-            "sidebarTitle": "视频剪辑 V2"
-          }
-        },
-        "summary": "视频剪辑 V2",
-        "description": "根据提示词生成剪辑结果，可输出视频或仅输出音频。",
-        "tags": ["视频剪辑 V2"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "prompt": {
-                    "type": "string",
-                    "description": "文本提示词",
-                    "example": "生成一段科幻电影",
-                    "default": "生成一段科幻电影"
-                  },
-                  "image_urls": {
-                    "type": "array",
-                    "description": "参考图片 URL 列表",
-                    "items": { "type": "string", "format": "uri" }
-                  },
-                  "video_urls": {
-                    "type": "array",
-                    "description": "参考视频 URL 列表",
-                    "items": { "type": "string", "format": "uri" }
-                  },
-                  "audio_urls": {
-                    "type": "array",
-                    "description": "参考音频 URL 列表",
-                    "items": { "type": "string", "format": "uri" }
-                  },
-                  "subtitle_urls": {
-                    "type": "array",
-                    "description": "字幕文件 URL 列表",
-                    "items": { "type": "string", "format": "uri" }
-                  },
-                  "type": {
-                    "type": "string",
-                    "description": "输出产物类型。\nvideo：输出视频（默认）。\naudio：仅输出音频。",
-                    "enum": ["video", "audio"],
-                    "example": "audio",
-                    "default": "video"
-                  },
-                  "resolution": {
-                    "type": "string",
-                    "description": "分辨率（可以直接指定像素【360p、480p、720p、1080p、2k、4k】，也支持宽高格式【如 1920x1080】）"
-                  },
-                  "format": {
-                    "type": "string",
-                    "description": "输出封装格式。可选值：mp4（视频）、mp3（音频）。未填写时按 type 自动选择。"
-                  },
-                  "fps": {
-                    "type": "string",
-                    "description": "视频输出帧率，仅当 type=video 时生效。取值范围 [15,60]，默认 25"
-                  },
-                  "meta": {
-                    "type": "string",
-                    "description": "可选的输出元信息"
-                  }
-                },
-                "required": ["prompt"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": { "type": "object" }
-              }
-            }
-          },
-          "404": {
-            "description": "失败",
-            "content": {
-              "application/json": {
-                "schema": { "type": "object" }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/workflow/aiVideoCheck": {
-      "post": {
-        "x-mint": {
-          "href": "/openapi-ref/workflow/ai-video-check",
-          "metadata": {
-            "sidebarTitle": "视频剪辑"
-          }
-        },
-        "summary": "视频剪辑",
-        "description": "",
-        "tags": ["视频剪辑"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "prompt": {
-                    "type": "string",
-                    "description": "文本提示词",
-                    "example": "直接合成"
-                  },
-                  "resolution_option": {
-                    "type": "integer",
-                    "description": "分辨率\n1：代表480p\n2：代表720p\n3：代表1080p",
-                    "example": 2
-                  },
-                  "reference_urls": {
-                    "type": "array",
-                    "description": "素材文件列表 URL",
-                    "example": [
-                      "https://oss.jeekmind.com/carimg/2baf3c/2026-10/0/jeekup_AiVideo202610101143354889.mp4"
-                    ],
-                    "items": { "type": "string", "format": "uri" }
-                  }
-                },
-                "required": ["prompt", "resolution_option", "reference_urls"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VideoTaskResponse"
-                },
-                "example": {
-                  "status": 100,
-                  "message": "操作成功",
-                  "data": {
-                    "id": 17477,
-                    "status": "Running",
-                    "amount": "12"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/workflow/aiVideo": {
-      "post": {
-        "x-mint": {
-          "href": "/openapi-ref/workflow/ai-video",
-          "metadata": {
-            "sidebarTitle": "谷歌 Omni"
-          }
-        },
-        "summary": "谷歌 Omni",
-        "description": "",
-        "tags": ["视频生成-谷歌 Omni"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "prompt": {
-                    "type": "string",
-                    "description": "文本提示词",
-                    "example": "景别：中景\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\n表演/动作：先回头微笑，再自然挥手。\n镜头建议：镜头稳定，中景构图保留建筑背景。",
-                    "default": "景别：中景\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\n表演/动作：先回头微笑，再自然挥手。\n镜头建议：镜头稳定，中景构图保留建筑背景。"
-                  },
-                  "aspect_ratio": {
-                    "type": "integer",
-                    "description": "画面比例（\n1:【16:9】\n2:【9:16】\n3:【1:1】\n4:【4:3】\n5:【3:4】\n）",
-                    "example": 3,
-                    "default": 3,
-                    "enum": [1, 2, 3, 4, 5]
-                  },
-                  "duration": {
-                    "type": "integer",
-                    "description": "需要生产视频的时长（最多10秒）",
-                    "example": 5,
-                    "minimum": 1,
-                    "maximum": 10
-                  },
-                  "resolution_option": {
-                    "type": "integer",
-                    "description": "分辨率\n2：720P\n3：1080P（2：720p；3：1080p）",
-                    "example": 2,
-                    "default": 2,
-                    "enum": [2, 3]
-                  },
-                  "images": {
-                    "type": "array",
-                    "description": "参考图片（最多上传7张）",
-                    "items": {
-                      "type": "string"
-                    },
-                    "example": []
-                  }
-                },
-                "required": [
-                  "prompt",
-                  "aspect_ratio",
-                  "duration",
-                  "resolution_option"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VideoTaskResponse"
-                },
-                "example": {
-                  "status": 100,
-                  "message": "操作成功",
-                  "data": {
-                    "id": 11,
-                    "status": "Running",
-                    "amount": 100
-                  }
-                }
-              }
-            }
-          }
-        },
-        "operationId": "createOmniVideo"
-      }
-    },
-    "/volcano/delAsset": {
-      "post": {
-        "summary": "删除素材",
-        "description": "",
-        "x-mint": {
-          "href": "/openapi-ref/volcano/del-asset",
-          "metadata": {
-            "sidebarTitle": "删除素材"
-          }
-        },
-        "tags": ["Seedance 官方-删除素材"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "integer",
-                    "description": "素材 ID",
-                    "example": 1
-                  }
-                },
-                "required": ["id"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "description": "状态码",
-                      "example": 100
-                    },
-                    "message": {
-                      "type": "string",
-                      "description": "响应消息",
-                      "example": "操作成功"
-                    },
-                    "data": {
-                      "type": "integer",
-                      "description": "被删除的素材 ID",
-                      "example": 1
-                    }
-                  },
-                  "required": ["status", "message", "data"]
-                },
-                "example": {
-                  "status": 100,
-                  "message": "操作成功",
-                  "data": 1
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/volcano/editAsset": {
-      "post": {
-        "summary": "更新素材名",
-        "description": "",
-        "x-mint": {
-          "href": "/openapi-ref/volcano/edit-asset",
-          "metadata": {
-            "sidebarTitle": "更新素材名"
-          }
-        },
-        "tags": ["Seedance 官方-更新素材名"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "integer",
-                    "description": "素材 ID",
-                    "example": 1
-                  },
-                  "file_name": {
-                    "type": "string",
-                    "description": "文件名",
-                    "example": "sample-image.jpg"
-                  }
-                },
-                "required": ["id", "file_name"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "description": "状态码",
-                      "example": 100
-                    },
-                    "message": {
-                      "type": "string",
-                      "description": "响应消息",
-                      "example": "操作成功"
-                    },
-                    "data": {
-                      "type": "integer",
-                      "description": "被更新的素材 ID",
-                      "example": 1
-                    }
-                  },
-                  "required": ["status", "message", "data"]
-                },
-                "example": {
-                  "status": 100,
-                  "message": "操作成功",
-                  "data": 1
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/volcano/getAssetStatus": {
-      "post": {
-        "summary": "获取素材审核结果",
-        "description": "",
-        "x-mint": {
-          "href": "/openapi-ref/volcano/get-asset-status",
-          "metadata": {
-            "sidebarTitle": "获取素材审核结果"
-          }
-        },
-        "tags": ["Seedance 官方-获取素材审核结果"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "integer",
-                    "description": "素材 ID",
-                    "example": 1
-                  }
-                },
-                "required": ["id"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "description": "状态码",
-                      "example": 100
-                    },
-                    "message": {
-                      "type": "string",
-                      "description": "响应消息",
-                      "example": "操作成功"
-                    },
-                    "data": {
-                      "type": "object",
-                      "description": "素材审核信息",
-                      "properties": {
-                        "id": {
-                          "type": "integer",
-                          "description": "ID",
-                          "example": 1
-                        },
-                        "status": {
-                          "type": "integer",
-                          "description": "状态（1 审核中，2 审核通过，3 审核失败）",
-                          "enum": [1, 2, 3],
-                          "example": 1
-                        },
-                        "file_name": {
-                          "type": "string",
-                          "description": "文件名",
-                          "example": "sample-image.jpg"
-                        },
-                        "message": {
-                          "type": "string",
-                          "description": "审核不通过的信息",
-                          "example": null
+        "/workflow/getResult": {
+            "post": {
+                "x-mint"     : { "href": "/openapi-ref/workflow/get-result", "metadata": {"sidebarTitle": "获取生成结果"} },
+                "summary"    : "获取生成结果",
+                "description": "",
+                "tags"       : ["获取生成结果"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type"      : "object",
+                                "properties": { "id": {"type": "integer", "description": "会话ID", "example": 1} },
+                                "required"  : ["id"]
+                            }
                         }
-                      },
-                      "required": ["id", "status", "file_name", "message"]
                     }
-                  },
-                  "required": ["status", "message", "data"]
                 },
-                "example": {
-                  "status": 100,
-                  "message": "操作成功",
-                  "data": {
-                    "id": 1,
-                    "status": 1,
-                    "file_name": "sample-image.jpg",
-                    "message": null
-                  }
+                "responses"  : {
+                    "200": {
+                        "description": "成功",
+                        "content"    : {
+                            "application/json": {
+                                "schema"  : {"$ref": "#/components/schemas/ResultResponse", "title": "生成结果"},
+                                "examples": {
+                                    "成功-视频生成": {
+                                        "summary": "视频生成",
+                                        "value"  : {
+                                            "status" : 100,
+                                            "message": "操作成功",
+                                            "data"   : {
+                                                "id": 376592,
+                                                "status": "Success",
+                                                "temporary_url": "https://ark-acg-beijing.tos-cn-beijing.volces.com/doubao-seedance-2-5/cgt-20260904165749-7pm5n.mp4",
+                                                "msg": null,
+                                                "amount": -4
+                                            }
+                                        }
+                                    },
+                                    "成功-视频剪辑": {
+                                        "summary": "视频剪辑",
+                                        "value"  : {
+                                            "status" : 100,
+                                            "message": "操作成功",
+                                            "data"   : {
+                                                "id": 376740,
+                                                "status": "Success",
+                                                "response_json": "[\"https://oss.jeekmind.com/carimg/2baf3c/2026-10/0/jeekup_aiVideoCheck202610101703142665.mp4\"]",
+                                                "msg": null,
+                                                "amount": 0
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "operationId": "getVideoResult"
+            }
+        },
+        "/workflow/aiVideoParse": {
+            "post": {
+                "summary"    : "视频解析",
+                "x-mint"     : {
+                    "href"    : "/openapi-ref/workflow/ai-video-parse",
+                    "metadata": {"sidebarTitle": "视频解析"}
+                },
+                "tags"       : ["视频解析"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type"      : "object",
+                                "properties": {
+                                    "file_url": {
+                                        "type": "string",
+                                        "description": "视频 URL",
+                                        "example": "https://wenlv-debug.oss-cn-shenzhen.aliyuncs.com/carimg/2baf3c/2025-10/0//coze_AiVideo202510291126186944.mp4"
+                                    }
+                                },
+                                "required"  : ["file_url"]
+                            }
+                        }
+                    }
+                },
+                "responses"  : {
+                    "200": {
+                        "description": "成功",
+                        "content"    : {
+                            "application/json": {
+                                "schema" : {"$ref": "#/components/schemas/VideoTaskResponse"},
+                                "example": {
+                                    "status" : 100,
+                                    "message": "操作成功",
+                                    "data"   : {"id": 17477, "status": "Running", "amount": "12"}
+                                }
+                            }
+                        }
+                    }
                 }
-              }
             }
-          }
-        }
-      }
-    },
-    "/volcano/getUserAssetList": {
-      "post": {
-        "summary": "素材管理列表",
-        "description": "",
-        "x-mint": {
-          "href": "/openapi-ref/volcano/get-user-asset-list",
-          "metadata": {
-            "sidebarTitle": "素材列表"
-          }
         },
-        "tags": ["Seedance 官方-素材列表"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "page": {
-                    "type": "integer",
-                    "description": "页码",
-                    "example": 1
-                  },
-                  "size": {
-                    "type": "integer",
-                    "description": "每页大小",
-                    "example": 10
-                  },
-                  "status": {
-                    "type": "number",
-                    "description": "状态（1 审核中，2 审核通过，3 审核失败）",
-                    "enum": [1, 2, 3]
-                  },
-                  "keywords": {
-                    "type": "string",
-                    "description": "关键词",
-                    "example": ""
-                  },
-                  "file_type": {
-                    "type": "string",
-                    "description": "素材类型（image 图片，video 视频，audio 音频）",
-                    "enum": ["image", "video", "audio"]
-                  }
+        "/workflow/aiImage": {
+            "post": {
+                "x-mint"     : { "href": "/openapi-ref/workflow/ai-image", "metadata": {"sidebarTitle": "通用图片生成"} },
+                "summary"    : "图片生成-通用图片生成",
+                "description": "",
+                "tags"       : ["图片生成-通用图片生成"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type"      : "object",
+                                "properties": {
+                                    "aspect_ratio"     : {
+                                        "type"       : "integer",
+                                        "description": "画面比例（1:【16:9】。2:【9:16】。3:【1:1】。4:【4:3】。5:【3:4】）",
+                                        "example"    : 3,
+                                        "enum"       : [1, 2, 3, 4, 5]
+                                    },
+                                    "channel_option"   : {
+                                        "type"       : "integer",
+                                        "description": "渠道\n1:Mimage-渠道1\n2:Mimage-渠道2",
+                                        "example"    : 1,
+                                        "enum"       : [1, 2]
+                                    },
+                                    "prompt"           : {
+                                        "type"       : "string",
+                                        "description": "文本提示词",
+                                        "example"    : "有关于莲花荷叶等其他元素的国画水墨风格，写意山水，风格像大师的发挥感，画面尽量饱满，画面体现廉政精神，不要有文字的出现"
+                                    },
+                                    "resolution_option": {
+                                        "type"       : "integer",
+                                        "description": "图像分辨率（1：720P\n2：1080P\n3：2K）",
+                                        "example"    : 1,
+                                        "enum"       : [1, 2, 3]
+                                    },
+                                    "quality"          : {
+                                        "type"       : "integer",
+                                        "description": "图像质量（1:'auto', \n2:'low', \n3:'medium', \n4:'high')",
+                                        "example"    : 1,
+                                        "enum"       : [1, 2, 3, 4]
+                                    },
+                                    "reference_urls"   : {
+                                        "type"       : "array",
+                                        "description": "参考图片 URL",
+                                        "items"      : {"type": "string", "format": "uri"},
+                                        "example"    : [
+                                            "https://ark-project.tos-cn-beijing.volces.com/doc_image/i2v_foxrgirl.png"
+                                        ]
+                                    }
+                                },
+                                "required"  : ["aspect_ratio", "channel_option", "prompt", "resolution_option"]
+                            }
+                        }
+                    }
                 },
-                "required": ["page", "size"]
-              }
+                "responses"  : {
+                    "200": {
+                        "description": "成功",
+                        "content"    : {
+                            "application/json": {
+                                "schema" : {"$ref": "#/components/schemas/VideoTaskResponse"},
+                                "example": {
+                                    "status" : 100,
+                                    "message": "操作成功",
+                                    "data"   : {"id": 17477, "status": "Running", "amount": "12"}
+                                }
+                            }
+                        }
+                    }
+                }
             }
-          }
         },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "number",
-                      "description": "状态码",
-                      "example": 100
-                    },
-                    "message": {
-                      "type": "string",
-                      "description": "响应消息",
-                      "example": "操作成功"
-                    },
-                    "data": {
-                      "type": "object",
-                      "description": "素材列表数据",
-                      "properties": {
-                        "count": {
-                          "type": "number",
-                          "description": "素材总数",
-                          "example": 1
-                        },
-                        "list": {
-                          "type": "array",
-                          "description": "素材列表",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "number",
-                                "description": "ID",
-                                "example": 1
-                              },
-                              "user_id": {
-                                "type": "number",
-                                "description": "用户ID",
-                                "example": 10
-                              },
-                              "website_id": {
-                                "type": "number",
-                                "description": "站点ID",
-                                "example": 10
-                              },
-                              "file_name": {
-                                "type": "string",
-                                "description": "文件名",
-                                "example": "r2v_tea_pic1.jpg"
-                              },
-                              "file_url": {
-                                "type": "string",
-                                "description": "文件链接",
-                                "example": ""
-                              },
-                              "assetType": {
-                                "type": "string",
-                                "description": "文件类型",
-                                "example": "jpg"
-                              },
-                              "file_id": {
-                                "type": "string",
-                                "description": "对应火山上的文件ID",
-                                "example": "asset-20260826-example"
-                              },
-                              "status": {
-                                "type": "number",
-                                "description": "状态（1 审核中，2 审核通过，3 审核失败）",
-                                "enum": [1, 2, 3],
-                                "example": 1
-                              },
-                              "message": {
-                                "type": "null",
-                                "description": "错误信息",
-                                "example": null
-                              },
-                              "error_code": {
-                                "type": "null",
-                                "description": "错误代码",
-                                "example": null
-                              }
+        "/workflow/seedreamAiImage": {
+            "post": {
+                "x-mint"     : {
+                    "href"    : "/openapi-ref/workflow/seedream-ai-image",
+                    "metadata": {"sidebarTitle": "Seedream 5.0 Lite"}
+                },
+                "summary"    : "图片生成-Seedream 5.0 Lite",
+                "description": "",
+                "tags"       : ["图片生成-Seedream 5.0 Lite"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type"      : "object",
+                                "properties": {
+                                    "aspect_ratio"     : {
+                                        "type"       : "integer",
+                                        "description": "画面比例（1:【16:9】。2:【9:16】。3:【1:1】。4:【4:3】。5:【3:4】）",
+                                        "example"    : 3,
+                                        "enum"       : [1, 2, 3, 4, 5]
+                                    },
+                                    "channel_option"   : {
+                                        "type"       : "integer",
+                                        "description": "渠道（1 渠道一）",
+                                        "example"    : 1,
+                                        "enum"       : [1]
+                                    },
+                                    "n"                : {
+                                        "type"       : "integer",
+                                        "description": "输出图片数量：1~5",
+                                        "example"    : 3,
+                                        "minimum"    : 1,
+                                        "maximum"    : 5
+                                    },
+                                    "prompt"           : {
+                                        "type"       : "string",
+                                        "description": "文本提示词",
+                                        "example"    : "生成今年世界杯的宣传海报"
+                                    },
+                                    "resolution_option": {
+                                        "type"       : "integer",
+                                        "description": "分辨率\n3：2K，4：3K，5：4K",
+                                        "example"    : 3,
+                                        "enum"       : [3, 4, 5]
+                                    },
+                                    "reference_urls"   : {
+                                        "type"       : "array",
+                                        "description": "参考图片 URL",
+                                        "items"      : {"type": "string", "format": "uri"},
+                                        "example"    : [
+                                            "https://ark-project.tos-cn-beijing.volces.com/doc_image/i2v_foxrgirl.png"
+                                        ]
+                                    }
+                                },
+                                "required"  : ["aspect_ratio", "channel_option", "n", "prompt", "resolution_option"]
+                            }
+                        }
+                    }
+                },
+                "responses"  : {
+                    "200": {
+                        "description": "成功",
+                        "content"    : {
+                            "application/json": {
+                                "schema" : {"$ref": "#/components/schemas/VideoTaskResponse"},
+                                "example": {
+                                    "status" : 100,
+                                    "message": "操作成功",
+                                    "data"   : {"id": 17477, "status": "Running", "amount": "12"}
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/workflow/seedanceLongAiVideo": {
+            "post": {
+                "summary"    : "seedance 2.5-官方",
+                "description": "",
+                "x-mint"     : {
+                    "href"    : "/openapi-ref/workflow/seedance-long-ai-video",
+                    "metadata": {"sidebarTitle": "Seedance 2.5 官方"}
+                },
+                "tags"       : ["视频生成-Seedance 2.5 官方"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type"      : "object",
+                                "properties": {
+                                    "model_option": {
+                                        "type"       : "integer",
+                                        "description": "模型选择（1 Seedance 2.5）",
+                                        "enum"       : [1],
+                                        "example"    : 1
+                                    },
+                                    "prompt": {"type": "string", "description": "提示词", "example": "生成一段科幻电影"},
+                                    "resolution_option": {
+                                        "type"       : "integer",
+                                        "description": "分辨率（1：480p，2：720p）",
+                                        "enum"       : [1, 2],
+                                        "example"    : 1
+                                    },
+                                    "duration": {
+                                        "type"       : "integer",
+                                        "description": "时长(支持 4 - 30 秒)",
+                                        "example"    : 4,
+                                        "minimum"    : 4,
+                                        "maximum"    : 30
+                                    },
+                                    "aspect_ratio": {
+                                        "type"       : "integer",
+                                        "description": "画面比例（\n1：【16:9】，2：【9:16】，3：【1:1】，4：【4:3】，5：【3:4】）",
+                                        "enum"       : [1, 2, 3, 4, 5],
+                                        "example"    : 4
+                                    },
+                                    "reference_urls": {
+                                        "type": "array",
+                                        "description": "参考图/视频/音频视频:（仅支持mp4、mov格式，分辨率480P、、720P，时长2-15s(总时长不超过15s)，单视频不超过50MB;\n图片:单图小于30MB(总大小不超过64MB)\n音频:仅支持wav、mp3格式，时长2-15s，单个音频不超过15MB;）",
+                                        "items": {
+                                            "oneOf": [
+                                                {"type": "integer", "description": "素材库资源 ID"                 },
+                                                {"type": "string",  "description": "资源 URL",   "format": "uri"}
+                                            ]
+                                        },
+                                        "example": []
+                                    },
+                                    "omni_reference_task_type": {
+                                        "type": "string",
+                                        "description": "模式\n默认值auto\nauto：由模型根据输入素材和提示词自动判定任务类型\nreference：全能参考\nedit：视频编辑（**当模式为视频编辑时，duration 时长不需要，输入会被自动忽略。**）\nextend：视频延长",
+                                        "enum": ["auto", "reference", "edit", "extend"],
+                                        "example": "auto",
+                                        "default": "auto"
+                                    }
+                                },
+                                "required"  : ["prompt", "resolution_option", "aspect_ratio"],
+                                "allOf"     : [
+                                    {
+                                        "if"  : {
+                                            "properties": { "omni_reference_task_type": {"const": "edit"} }
+                                        },
+                                        "then": {},
+                                        "else": { "required": ["duration"] }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses"  : {
+                    "200": {
+                        "description": "成功",
+                        "content"    : {
+                            "application/json": {
+                                "schema" : {"$ref": "#/components/schemas/VideoTaskResponse"},
+                                "example": {
+                                    "status" : 100,
+                                    "message": "操作成功",
+                                    "data"   : {"id": 11, "status": "Running", "amount": 100}
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/videos": {
+            "post": {
+                "x-mint"     : { "href": "/openapi-ref/v1/videos", "metadata": {"sidebarTitle": "聚合模型"} },
+                "summary"    : "视频生成-聚合模型",
+                "description": "",
+                "tags"       : ["视频生成-聚合模型"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type"      : "object",
+                                "properties": {
+                                    "duration"          : {"type": "integer", "description": "视频生成时长", "example": 4},
+                                    "model"             : {
+                                        "type": "string",
+                                        "description": "模型名（直接传模型名称：\ngxc-doubao-seedance-2-0-720p-second，\ngxc-doubao-seedance-2-0-fast-720p-second，\nme-MiniMax-H3，\njh-buming-seedance-2-0-official-480p，\ngxc-sd2.0-110，\ngxc-nv-seedance-2.5，\ngxc-wan3.0-video，\nmyu-wan3.0-video，\nmyu-wan3.0-video-prime，\ngxc-doubao-seedance-2-5-720p-second\n）",
+                                        "example": "gxc-wan3.0-video"
+                                    },
+                                    "prompt"            : {
+                                        "type"       : "string",
+                                        "description": "提示词",
+                                        "example"    : "生成一段科幻电影",
+                                        "default"    : "生成一段科幻电影"
+                                    },
+                                    "ratio"             : {
+                                        "type"       : "string",
+                                        "description": "画面比例（16:9,\n9:16,\n1:1,\n4:3,\n3:4,\n21:9）",
+                                        "example"    : "9:16"
+                                    },
+                                    "resolution"        : {
+                                        "type"       : "string",
+                                        "description": "分辨率（480p，\n720p，\n1080p，\n2K，\n3K，\n4K，\n768p，\n1440p）",
+                                        "example"    : "720p"
+                                    },
+                                    "audio_urls"        : {"type": "array", "description": "参考音频链接列表", "example": []},
+                                    "image_urls"        : {
+                                        "type"       : "array",
+                                        "description": "参考图片链接列表",
+                                        "example"    : [
+                                            "https://ark-project.tos-cn-beijing.volces.com/doc_image/i2v_foxrgirl.png"
+                                        ]
+                                    },
+                                    "video_urls"        : {
+                                        "type"       : "array",
+                                        "description": "参考视频链接列表",
+                                        "example"    : [
+                                            "https://arkdocs.tos-cn-beijing.volces.com/videos/video-generation/seedance2.5_reference2.mp4"
+                                        ]
+                                    },
+                                    "context_ir_enabled": {
+                                        "type"       : "integer",
+                                        "description": "是否开启提示词优化（0 否 1 是）【注意：当前值仅对MiniMax-H3 系列模型生效】",
+                                        "example"    : 1
+                                    },
+                                    "generate_audio"    : {
+                                        "type"       : "integer",
+                                        "description": "是否生成音频（0 否 1 是）【注意：当前值仅针对doubao-seedance系列模型】",
+                                        "example"    : 1
+                                    },
+                                    "priority"          : {
+                                        "type"       : "integer",
+                                        "description": "任务优先级（0 到 9，值越大，优先级越高）",
+                                        "example"    : 9
+                                    },
+                                    "return_last_frame" : {
+                                        "type"       : "integer",
+                                        "description": "是否返回最后一帧（0 否 1 是）【注意：当前值仅针对doubao-seedance系列模型】",
+                                        "example"    : 1
+                                    },
+                                    "tools"             : {
+                                        "type"       : "string",
+                                        "description": "工具：【注意：当前值仅针对doubao-seedance系列模型】",
+                                        "example"    : ""
+                                    },
+                                    "watermark"         : {
+                                        "type"       : "integer",
+                                        "description": "是否添加水印（0 否 1 是）【注意：当前值仅针对doubao-seedance系列模型】",
+                                        "example"    : 1
+                                    }
+                                },
+                                "required"  : ["duration", "model", "prompt", "ratio", "resolution"]
+                            }
+                        }
+                    }
+                },
+                "responses"  : {
+                    "200": {
+                        "description": "成功",
+                        "content"    : {
+                            "application/json": {
+                                "schema" : {"$ref": "#/components/schemas/VideoTaskResponse"},
+                                "example": {
+                                    "status" : 100,
+                                    "message": "操作成功",
+                                    "data"   : {"id": 2713472, "status": "Running", "amount": 21}
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/workflow/seedanceDiscountChannel1": {
+            "post": {
+                "x-mint"     : {
+                    "href"    : "/openapi-ref/workflow/seedance-discount-channel1",
+                    "metadata": {"sidebarTitle": "Seedance 体验1"}
+                },
+                "summary"    : "Seedance 体验1",
+                "description": "",
+                "tags"       : ["视频生成-Seedance 体验1"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type"      : "object",
+                                "properties": {
+                                    "prompt"           : {
+                                        "type"       : "string",
+                                        "description": "提示词",
+                                        "example"    : "生成一段科幻世界的视频",
+                                        "default"    : ""
+                                    },
+                                    "aspect_ratio"     : {
+                                        "type"       : "integer",
+                                        "description": "画面比例\n1:【16:9】\n2:【9:16】\n3:【1:1】",
+                                        "example"    : 2,
+                                        "enum"       : [1, 2, 3]
+                                    },
+                                    "model_option"     : {
+                                        "type"       : "integer",
+                                        "description": "模型\n6：满血稳定-支持人脸-9 图 3 视频 3 音频\n7：满血-支持人脸-9 图 3 视频 3 音频",
+                                        "example"    : 6,
+                                        "enum"       : [6, 7]
+                                    },
+                                    "resolution_option": {
+                                        "type": "integer",
+                                        "description": "分辨率\n1：代表480p\n2：代表720p\n3：代表1080p \n4：代表4k\n\n\n模型6支持：2\n模型7支持：2",
+                                        "example": 2,
+                                        "enum": [2]
+                                    },
+                                    "reference_urls"   : {
+                                        "type"       : "array",
+                                        "description": "参考素材 \n模型6：支持9参考图、3参考视频、3参考音频\n模型7：支持9参考图、3参考视频、3参考音频",
+                                        "items"      : {"type": "string", "format": "uri"},
+                                        "example"    : []
+                                    },
+                                    "duration"         : {"type": "integer", "description": "生成视频时长（秒）", "example": 15}
+                                },
+                                "required"  : [
+                                    "prompt",            "aspect_ratio",      "model_option",      "resolution_option",
+                                    "duration"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses"  : {
+                    "200": {
+                        "description": "成功",
+                        "content"    : {
+                            "application/json": {
+                                "schema" : {"$ref": "#/components/schemas/VideoTaskResponse"},
+                                "example": {
+                                    "status" : 100,
+                                    "message": "操作成功",
+                                    "data"   : {"id": 11, "status": "Running", "amount": 100}
+                                }
+                            }
+                        }
+                    }
+                },
+                "operationId": "createSeedanceExperience1Video"
+            }
+        },
+        "/workflow/seedanceDiscountChannel2": {
+            "post": {
+                "summary"    : "视频生成-Seedance 体验 2",
+                "description": "",
+                "x-mint"     : {
+                    "href"    : "/openapi-ref/workflow/seedance-discount-channel2",
+                    "metadata": {"sidebarTitle": "Seedance 体验2"}
+                },
+                "tags"       : ["视频生成-Seedance 体验2"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type"      : "object",
+                                "properties": {
+                                    "aspect_ratio"     : {
+                                        "type"       : "integer",
+                                        "description": "画面比例\n1:【16:9】\n2:【9:16】\n3:【1:1】\n4:【4:3】\n5:【3:4】",
+                                        "example"    : 2,
+                                        "default"    : 2
+                                    },
+                                    "duration"         : {
+                                        "type"       : "integer",
+                                        "description": "时长\n\n2.5支持 4-30s\n2.0支持 4-15s",
+                                        "example"    : 15,
+                                        "minimum"    : 4,
+                                        "maximum"    : 30
+                                    },
+                                    "model_option"     : {
+                                        "type": "integer",
+                                        "description": "模型\n(1：官方优惠 - Seedance2.0满血 - 支持人脸；\n2：官方优惠 - Seedance2.0fast - 支持人脸；\n3：官方优惠 - Seedance2.5 - 支持人脸；\n4：Seedance2.5 - 支持人脸\n)",
+                                        "example": 1,
+                                        "enum": [1, 2, 3, 4]
+                                    },
+                                    "priority"         : {
+                                        "type"       : "integer",
+                                        "description": "优先级（0到9）",
+                                        "example"    : 1,
+                                        "minimum"    : 1,
+                                        "maximum"    : 9
+                                    },
+                                    "prompt"           : {
+                                        "type"       : "string",
+                                        "description": "提示词",
+                                        "example"    : "生成一段科幻世界的视频",
+                                        "default"    : "生成一段科幻电影"
+                                    },
+                                    "resolution_option": {
+                                        "type": "integer",
+                                        "description": "分辨率\n1：代表480p\n2：代表720p\n3：代表1080p \n4：代表2K\n5：代表3K\n6：代表4k\n\n\n模型3支持：2",
+                                        "example": 2,
+                                        "default": 2,
+                                        "enum": [1, 2, 3, 4, 5, 6]
+                                    },
+                                    "return_last_frame": {
+                                        "type"       : "integer",
+                                        "description": "是否返回最后一帧【0 否 1 是】（默认：0）",
+                                        "default"    : 0,
+                                        "example"    : 0,
+                                        "enum"       : [0, 1]
+                                    },
+                                    "watermark"        : {
+                                        "type"       : "integer",
+                                        "description": "是否关闭水印【0 否 1 是】（默认：1）",
+                                        "default"    : 1,
+                                        "example"    : 1,
+                                        "enum"       : [0, 1]
+                                    },
+                                    "generate_audio"   : {
+                                        "type"       : "integer",
+                                        "description": "是否生成音频【0 否 1 是】（默认0)",
+                                        "default"    : 0,
+                                        "example"    : 0,
+                                        "enum"       : [0, 1]
+                                    },
+                                    "tools"            : {
+                                        "type"       : "array",
+                                        "description": "工具",
+                                        "example"    : [ {"type": "web_search"} ]
+                                    },
+                                    "reference_urls"   : {
+                                        "type"       : "array",
+                                        "description": "2.5支持30图10音频10视频",
+                                        "items"      : {
+                                            "oneOf": [
+                                                {"type": "integer", "description": "素材库资源 ID"                 },
+                                                {"type": "string",  "description": "资源 URL",   "format": "uri"}
+                                            ]
+                                        },
+                                        "example"    : []
+                                    }
+                                },
+                                "required"  : [
+                                    "aspect_ratio",      "duration",          "model_option",      "prompt",
+                                    "resolution_option"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses"  : {
+                    "200": {
+                        "description": "成功",
+                        "content"    : {
+                            "application/json": {
+                                "schema" : {"$ref": "#/components/schemas/VideoTaskResponse"},
+                                "example": {
+                                    "status" : 100,
+                                    "message": "操作成功",
+                                    "data"   : {"id": 11, "status": "Running", "amount": 100}
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/workflow/seedanceDiscountChannel3": {
+            "post": {
+                "x-mint"     : {
+                    "href"    : "/openapi-ref/workflow/seedance-discount-channel3",
+                    "metadata": {"sidebarTitle": "Seedance 体验3"}
+                },
+                "summary"    : "Seedance 体验3",
+                "description": "",
+                "tags"       : ["视频生成-Seedance 体验3"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type"      : "object",
+                                "properties": {
+                                    "prompt"           : {
+                                        "type": "string",
+                                        "description": "提示词",
+                                        "example": "全程使用视频1的第一视角构图，全程使用音频1作为背景音乐。第一人称视角果茶宣传广告，seedance牌「苹苹安安」苹果果茶限定款；首帧为图片1，你的手摘下一颗带晨露的阿克苏红苹果，轻脆的苹果碰撞声；2-4 秒：第一人称手持举杯，你将图片2中的果茶举到镜头前（模拟递到观众面前的视角），杯身标签清晰可见，背景音「来一口鲜爽」，尾帧定格为图片2。背景声音统一为女生音色。",
+                                        "default": ""
+                                    },
+                                    "aspect_ratio"     : {
+                                        "type"       : "integer",
+                                        "description": "画面比例\n1:【16:9】\n2:【9:16】\n3:【1:1】\n4:【3:4】\n5:【4:3】",
+                                        "example"    : 2,
+                                        "enum"       : [1, 2, 3, 4, 5]
+                                    },
+                                    "model_option"     : {
+                                        "type"       : "integer",
+                                        "description": "模型选择\n3：Seedance2.0-满血-支持人脸",
+                                        "example"    : 3,
+                                        "enum"       : [3]
+                                    },
+                                    "resolution_option": {
+                                        "type"       : "integer",
+                                        "description": "分辨率\n2：720p \n3：1080p\n\n模型3：支持3",
+                                        "example"    : 3,
+                                        "enum"       : [3]
+                                    },
+                                    "duration"         : {
+                                        "type"       : "integer",
+                                        "description": "生成视频时长（4–15 秒）",
+                                        "minimum"    : 4,
+                                        "maximum"    : 15,
+                                        "example"    : 15
+                                    },
+                                    "reference_urls"   : {
+                                        "type"       : "array",
+                                        "description": "参考素材\n模型3：支持9参考图、3参考视频、3参考音频\n",
+                                        "items"      : {"type": "string", "format": "uri"},
+                                        "example"    : []
+                                    }
+                                },
+                                "required"  : [
+                                    "prompt",            "aspect_ratio",      "model_option",      "resolution_option",
+                                    "duration"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses"  : {
+                    "200": {
+                        "description": "成功",
+                        "content"    : {
+                            "application/json": {
+                                "schema" : {"$ref": "#/components/schemas/VideoTaskResponse"},
+                                "example": {
+                                    "status" : 100,
+                                    "message": "操作成功",
+                                    "data"   : {"id": 11, "status": "Running", "amount": 100}
+                                }
+                            }
+                        }
+                    }
+                },
+                "operationId": "createSeedanceExperience3Video"
+            }
+        },
+        "/workflow/seedanceDiscountChannel6": {
+            "post": {
+                "x-mint"     : {
+                    "href"    : "/openapi-ref/workflow/seedance-discount-channel6",
+                    "metadata": {"sidebarTitle": "MiniMax"}
+                },
+                "summary"    : "MiniMax",
+                "description": "",
+                "tags"       : ["视频生成-MiniMax"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type"      : "object",
+                                "properties": {
+                                    "aspect_ratio"      : {
+                                        "type"       : "integer",
+                                        "description": "画面比例\n1:【16:9】\n2:【9:16】\n3:【1:1】\n4:【3:4】\n5:【4:3】",
+                                        "example"    : 2,
+                                        "enum"       : [1, 2, 3, 4, 5]
+                                    },
+                                    "duration"          : {
+                                        "type"       : "integer",
+                                        "description": "生成视频时长",
+                                        "example"    : 4,
+                                        "minimum"    : 4,
+                                        "maximum"    : 15
+                                    },
+                                    "model_option"      : {
+                                        "type"       : "integer",
+                                        "description": "模型选择。请使用 `1`",
+                                        "example"    : 1,
+                                        "enum"       : [1]
+                                    },
+                                    "prompt"            : {
+                                        "type": "string",
+                                        "description": "提示词",
+                                        "example": "全程使用视频1的第一视角构图，全程使用音频1作为背景音乐。第一人称视角果茶宣传广告，seedance牌「苹苹安安」苹果果茶限定款；首帧为图片1，你的手摘下一颗带晨露的阿克苏红苹果，轻脆的苹果碰撞声；2-4 秒：第一人称手持举杯，你将图片2中的果茶举到镜头前（模拟递到观众面前的视角），杯身标签清晰可见，背景音「来一口鲜爽」，尾帧定格为图片2。背景声音统一为女生音色。",
+                                        "default": ""
+                                    },
+                                    "resolution_option" : {
+                                        "type"       : "integer",
+                                        "description": "图像分辨率\n4：2K、\n5：3K、\n6：4K、\n7：768p、\n8：1440p",
+                                        "example"    : 4,
+                                        "enum"       : [4, 5, 6, 7, 8]
+                                    },
+                                    "context_ir_enabled": {
+                                        "type"       : "boolean",
+                                        "description": "是否开启提示词优化（true ：开启，false ：关闭）默认开启",
+                                        "default"    : true,
+                                        "example"    : true
+                                    },
+                                    "reference_urls"    : {
+                                        "type"       : "array",
+                                        "description": "参考素材",
+                                        "items"      : {"type": "string", "format": "uri"},
+                                        "example"    : [
+                                            "https://ark-project.tos-cn-beijing.volces.com/doc_image/i2v_foxrgirl.png"
+                                        ]
+                                    }
+                                },
+                                "required"  : [
+                                    "aspect_ratio",      "duration",          "model_option",      "prompt",
+                                    "resolution_option"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses"  : {
+                    "200": {
+                        "description": "成功",
+                        "content"    : {
+                            "application/json": {
+                                "schema" : {"$ref": "#/components/schemas/VideoTaskResponse"},
+                                "example": {
+                                    "status" : 100,
+                                    "message": "操作成功",
+                                    "data"   : {"id": 11, "status": "Running", "amount": 100}
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/workflow/seedanceDiscount": {
+            "post": {
+                "x-mint"     : {
+                    "href"    : "/openapi-ref/workflow/seedance-discount",
+                    "metadata": {"sidebarTitle": "Seedance 限时折扣（支持人脸）"}
+                },
+                "summary"    : "Seedance 限时折扣（支持人脸）",
+                "description": "",
+                "tags"       : ["视频生成-Seedance 限时折扣（支持人脸）"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type"      : "object",
+                                "properties": {
+                                    "prompt"           : {
+                                        "type": "string",
+                                        "description": "文本提示词",
+                                        "example": "景别：中景\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\n表演/动作：先回头微笑，再自然挥手。\n镜头建议：镜头稳定，中景构图保留建筑背景。",
+                                        "default": "景别：中景\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\n表演/动作：先回头微笑，再自然挥手。\n镜头建议：镜头稳定，中景构图保留建筑背景。"
+                                    },
+                                    "resolution_option": {
+                                        "type"       : "integer",
+                                        "description": "分辨率\n1：代表 480P\n2：代表 720P\n3：代表 1080P",
+                                        "example"    : 1,
+                                        "enum"       : [1, 2, 3]
+                                    },
+                                    "duration"         : {"type": "integer", "description": "时长", "example": 5},
+                                    "aspect_ratio"     : {
+                                        "type"       : "integer",
+                                        "description": "画面比例\n1：代表【16:9】\n2：代表【9:16】\n3：代表【1:1】\n4：代表【4:3】\n5：代表【3:4】",
+                                        "example"    : 3,
+                                        "enum"       : [1, 2, 3, 4, 5]
+                                    },
+                                    "reference_urls"   : {
+                                        "type": "array",
+                                        "description": "参考图/视频/音频\n\n支持9参考图、3参考视频、3参考音频。\n\n视频：仅支持mp4、mov格式，分辨率480P、720P，时长2-15s，单视频不超过50MB;\n图片：单图小于30MB(总大小不超过64MB)\n音频：仅支持wav、mp3格式，时长2-15s，单个音频不超过15MB;",
+                                        "items": {
+                                            "oneOf": [
+                                                {"type": "integer", "description": "素材库资源 ID，字符类型必须是整形。"},
+                                                {"type": "string", "format": "uri", "description": "资源 URL"}
+                                            ]
+                                        },
+                                        "example": []
+                                    }
+                                },
+                                "required"  : ["prompt", "resolution_option", "duration", "aspect_ratio"]
+                            }
+                        }
+                    }
+                },
+                "responses"  : {
+                    "200": {
+                        "description": "成功",
+                        "content"    : {
+                            "application/json": {
+                                "schema" : {"$ref": "#/components/schemas/VideoTaskResponse"},
+                                "example": {
+                                    "status" : 100,
+                                    "message": "操作成功",
+                                    "data"   : {"id": 11, "status": "Running", "amount": 100}
+                                }
+                            }
+                        }
+                    }
+                },
+                "operationId": "createSeedanceDiscountVideo"
+            }
+        },
+        "/workflow/liveAiVideo": {
+            "post": {
+                "x-mint"     : {
+                    "href"    : "/openapi-ref/workflow/live-ai-video",
+                    "metadata": {"sidebarTitle": "Seedance（支持人脸）"}
+                },
+                "summary"    : "Seedance（支持人脸）",
+                "description": "",
+                "tags"       : ["视频生成-Seedance（支持人脸）"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type"      : "object",
+                                "properties": {
+                                    "prompt"           : {
+                                        "type": "string",
+                                        "description": "文本提示词",
+                                        "example": "景别：中景\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\n表演/动作：先回头微笑，再自然挥手。\n镜头建议：镜头稳定，中景构图保留建筑背景。",
+                                        "default": "景别：中景\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\n表演/动作：先回头微笑，再自然挥手。\n镜头建议：镜头稳定，中景构图保留建筑背景。"
+                                    },
+                                    "resolution_option": {
+                                        "type": "integer",
+                                        "description": "分辨率\n1：480P（支持模型：全部模型）\n2：720P（支持模型：全部模型）\n3：1080P（支持模型：真人版-视频生成）",
+                                        "example": 1,
+                                        "default": 1,
+                                        "enum": [1, 2, 3]
+                                    },
+                                    "duration"         : {
+                                        "type"       : "integer",
+                                        "description": "时长",
+                                        "example"    : 5,
+                                        "default"    : 5
+                                    },
+                                    "aspect_ratio"     : {
+                                        "type"       : "integer",
+                                        "description": "画面比例\n1:【16:9】\n2:【9:16】\n3:【1:1】\n4:【4:3】\n5:【3:4】",
+                                        "example"    : 3,
+                                        "default"    : 3,
+                                        "enum"       : [1, 2, 3, 4, 5]
+                                    },
+                                    "channel_option"   : {
+                                        "type"       : "integer",
+                                        "description": "渠道\n1：真人版-视频生成\n2：真人版-视频生成-fast\n3：真人版-视频生成-mini",
+                                        "example"    : 1,
+                                        "default"    : 1,
+                                        "enum"       : [1, 2, 3]
+                                    },
+                                    "reference_urls"   : {
+                                        "type": "array",
+                                        "description": "参考图/视频/音频视频:（仅支持mp4、mov格式，分辨率480P、、720P，时长2-15s(总时长不超过15s)，单视频不超过50MB;\n图片:单图小于30MB(总大小不超过64MB)\n音频:仅支持wav、mp3格式，时长2-15s，单个音频不超过15MB;）",
+                                        "items": {
+                                            "oneOf": [
+                                                {"type": "integer", "description": "素材库资源 ID"                 },
+                                                {"type": "string",  "description": "资源 URL",   "format": "uri"}
+                                            ]
+                                        },
+                                        "example": []
+                                    }
+                                },
+                                "required"  : [
+                                    "prompt",            "resolution_option", "duration",          "aspect_ratio",
+                                    "channel_option"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses"  : {
+                    "200": {
+                        "description": "成功",
+                        "content"    : {
+                            "application/json": {
+                                "schema" : {"$ref": "#/components/schemas/VideoTaskResponse"},
+                                "example": {
+                                    "status" : 100,
+                                    "message": "操作成功",
+                                    "data"   : {"id": 11, "status": "Running", "amount": 100}
+                                }
+                            }
+                        }
+                    }
+                },
+                "operationId": "createLiveAiVideo"
+            }
+        },
+        "/workflow/seedanceAiVideo": {
+            "post": {
+                "x-mint"     : {
+                    "href"    : "/openapi-ref/workflow/seedance-ai-video",
+                    "metadata": {"sidebarTitle": "Seedance 原价"}
+                },
+                "summary"    : "Seedance 原价",
+                "description": "",
+                "tags"       : ["视频生成-Seedance 原价"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema" : {
+                                "type"      : "object",
+                                "properties": {
+                                    "prompt"           : {
+                                        "type"       : "string",
+                                        "description": "提示词，长度不超过800个字。",
+                                        "example"    : ""
+                                    },
+                                    "resolution_option": {
+                                        "type": "integer",
+                                        "enum": [1, 2, 3],
+                                        "description": "分辨率\n1：480P（支持模型：全部模型）\n2：720P（支持模型：全部模型）\n3：1080P（支持模型：生成视频-即梦seedance2.0满血）"
+                                    },
+                                    "duration"         : {"type": "integer"},
+                                    "aspect_ratio"     : {
+                                        "type"       : "integer",
+                                        "enum"       : [1, 2, 3, 4, 5],
+                                        "description": "画面比例\n1：16:9\n2：9:16\n3：1:1\n4：4:3\n5：3:4",
+                                        "example"    : 1
+                                    },
+                                    "reference_urls"   : {
+                                        "type": "array",
+                                        "description": "参考图/视频/音频视频:（仅支持mp4、mov格式，分辨率480P、、720P，时长2-15s(总时长不超过15s)，单视频不超过50MB;\n图片:单图小于30MB(总大小不超过64MB)\n音频:仅支持wav、mp3格式，时长2-15s，单个音频不超过15MB;）",
+                                        "items": {
+                                            "oneOf": [
+                                                {"type": "integer", "description": "素材库资源 ID"                 },
+                                                {"type": "string",  "description": "资源 URL",   "format": "uri"}
+                                            ]
+                                        }
+                                    },
+                                    "channel_option"   : {
+                                        "type": "integer",
+                                        "enum": [1, 3, 4],
+                                        "description": "渠道\n1：生成视频-即梦seedance2.0 满血\n3：生成视频-即梦seedance2.0-mini\n4：生成视频-即梦seedance2.0-mini",
+                                        "example": 4
+                                    }
+                                },
+                                "required"  : [
+                                    "prompt",            "resolution_option", "duration",          "aspect_ratio",
+                                    "reference_urls",    "channel_option"
+                                ]
                             },
-                            "required": [
-                              "id",
-                              "user_id",
-                              "website_id",
-                              "file_name",
-                              "file_url",
-                              "assetType",
-                              "file_id",
-                              "status",
-                              "message",
-                              "error_code"
-                            ]
-                          }
+                            "example": {
+                                "prompt": "景别：中景\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\n表演/动作：先回头微笑，再自然挥手。\n镜头建议：镜头稳定，中景构图保留建筑背景。",
+                                "resolution_option": 1,
+                                "duration": 5,
+                                "aspect_ratio": 3,
+                                "reference_urls": [],
+                                "channel_option": 1
+                            }
                         }
-                      },
-                      "required": ["count", "list"]
                     }
-                  },
-                  "required": ["status", "message", "data"]
                 },
-                "example": {
-                  "status": 100,
-                  "message": "操作成功",
-                  "data": {
-                    "count": 1,
-                    "list": [
-                      {
-                        "id": 1,
-                        "user_id": 10,
-                        "website_id": 10,
-                        "file_name": "sample-image.jpg",
-                        "file_url": "https://example.com/assets/sample-image.jpg",
-                        "assetType": "jpg",
-                        "file_id": "asset-20260826-example",
-                        "status": 1,
-                        "message": null,
-                        "error_code": null
-                      }
-                    ]
-                  }
-                }
-              }
+                "responses"  : {
+                    "200": {
+                        "description": "成功",
+                        "content"    : {
+                            "application/json": {
+                                "schema" : {"$ref": "#/components/schemas/VideoTaskResponse"},
+                                "example": {
+                                    "status" : 100,
+                                    "message": "操作成功",
+                                    "data"   : {"id": 11, "status": "Running", "amount": 100}
+                                }
+                            }
+                        }
+                    }
+                },
+                "operationId": "createSeedanceAiVideo"
             }
-          }
+        },
+        "/workflow/videoClip": {
+            "post": {
+                "x-mint"     : { "href": "/openapi-ref/workflow/video-clip", "metadata": {"sidebarTitle": "视频剪辑 V2"} },
+                "summary"    : "视频剪辑 V2",
+                "description": "根据提示词生成剪辑结果，可输出视频或仅输出音频。",
+                "tags"       : ["视频剪辑 V2"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type"      : "object",
+                                "properties": {
+                                    "prompt"       : {
+                                        "type"       : "string",
+                                        "description": "文本提示词",
+                                        "example"    : "生成一段科幻电影",
+                                        "default"    : "生成一段科幻电影"
+                                    },
+                                    "image_urls"   : {
+                                        "type"       : "array",
+                                        "description": "参考图片 URL 列表",
+                                        "items"      : {"type": "string", "format": "uri"}
+                                    },
+                                    "video_urls"   : {
+                                        "type"       : "array",
+                                        "description": "参考视频 URL 列表",
+                                        "items"      : {"type": "string", "format": "uri"}
+                                    },
+                                    "audio_urls"   : {
+                                        "type"       : "array",
+                                        "description": "参考音频 URL 列表",
+                                        "items"      : {"type": "string", "format": "uri"}
+                                    },
+                                    "subtitle_urls": {
+                                        "type"       : "array",
+                                        "description": "字幕文件 URL 列表",
+                                        "items"      : {"type": "string", "format": "uri"}
+                                    },
+                                    "type"         : {
+                                        "type"       : "string",
+                                        "description": "输出产物类型。\nvideo：输出视频（默认）。\naudio：仅输出音频。",
+                                        "enum"       : ["video", "audio"],
+                                        "example"    : "audio",
+                                        "default"    : "video"
+                                    },
+                                    "resolution"   : {
+                                        "type": "string",
+                                        "description": "分辨率（可以直接指定像素【360p、480p、720p、1080p、2k、4k】，也支持宽高格式【如 1920x1080】）"
+                                    },
+                                    "format"       : {
+                                        "type"       : "string",
+                                        "description": "输出封装格式。可选值：mp4（视频）、mp3（音频）。未填写时按 type 自动选择。"
+                                    },
+                                    "fps"          : {
+                                        "type"       : "string",
+                                        "description": "视频输出帧率，仅当 type=video 时生效。取值范围 [15,60]，默认 25"
+                                    },
+                                    "meta"         : {"type": "string", "description": "可选的输出元信息"}
+                                },
+                                "required"  : ["prompt"]
+                            }
+                        }
+                    }
+                },
+                "responses"  : {
+                    "200": {
+                        "description": "成功",
+                        "content"    : {
+                            "application/json": { "schema": {"type": "object"} }
+                        }
+                    },
+                    "404": {
+                        "description": "失败",
+                        "content"    : {
+                            "application/json": { "schema": {"type": "object"} }
+                        }
+                    }
+                }
+            }
+        },
+        "/workflow/aiVideoCheck": {
+            "post": {
+                "x-mint"     : {
+                    "href"    : "/openapi-ref/workflow/ai-video-check",
+                    "metadata": {"sidebarTitle": "视频剪辑"}
+                },
+                "summary"    : "视频剪辑",
+                "description": "",
+                "tags"       : ["视频剪辑"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type"      : "object",
+                                "properties": {
+                                    "prompt"           : {"type": "string", "description": "文本提示词", "example": "直接合成"},
+                                    "resolution_option": {
+                                        "type"       : "integer",
+                                        "description": "分辨率\n1：代表480p\n2：代表720p\n3：代表1080p",
+                                        "example"    : 2
+                                    },
+                                    "reference_urls"   : {
+                                        "type"       : "array",
+                                        "description": "素材文件列表 URL",
+                                        "example"    : [
+                                            "https://oss.jeekmind.com/carimg/2baf3c/2026-10/0/jeekup_AiVideo202610101143354889.mp4"
+                                        ],
+                                        "items"      : {"type": "string", "format": "uri"}
+                                    }
+                                },
+                                "required"  : ["prompt", "resolution_option", "reference_urls"]
+                            }
+                        }
+                    }
+                },
+                "responses"  : {
+                    "200": {
+                        "description": "成功",
+                        "content"    : {
+                            "application/json": {
+                                "schema" : {"$ref": "#/components/schemas/VideoTaskResponse"},
+                                "example": {
+                                    "status" : 100,
+                                    "message": "操作成功",
+                                    "data"   : {"id": 17477, "status": "Running", "amount": "12"}
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/workflow/aiVideo": {
+            "post": {
+                "x-mint"     : { "href": "/openapi-ref/workflow/ai-video", "metadata": {"sidebarTitle": "谷歌 Omni"} },
+                "summary"    : "谷歌 Omni",
+                "description": "",
+                "tags"       : ["视频生成-谷歌 Omni"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type"      : "object",
+                                "properties": {
+                                    "prompt"           : {
+                                        "type": "string",
+                                        "description": "文本提示词",
+                                        "example": "景别：中景\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\n表演/动作：先回头微笑，再自然挥手。\n镜头建议：镜头稳定，中景构图保留建筑背景。",
+                                        "default": "景别：中景\n画面内容：小青背对镜头站在展馆前，随后转身回头，脱掉衣服，朝镜头招手打招呼；接着再朝镜头外挥手。\n表演/动作：先回头微笑，再自然挥手。\n镜头建议：镜头稳定，中景构图保留建筑背景。"
+                                    },
+                                    "aspect_ratio"     : {
+                                        "type"       : "integer",
+                                        "description": "画面比例（\n1:【16:9】\n2:【9:16】\n3:【1:1】\n4:【4:3】\n5:【3:4】\n）",
+                                        "example"    : 3,
+                                        "default"    : 3,
+                                        "enum"       : [1, 2, 3, 4, 5]
+                                    },
+                                    "duration"         : {
+                                        "type"       : "integer",
+                                        "description": "需要生产视频的时长（最多10秒）",
+                                        "example"    : 5,
+                                        "minimum"    : 1,
+                                        "maximum"    : 10
+                                    },
+                                    "resolution_option": {
+                                        "type"       : "integer",
+                                        "description": "分辨率\n2：720P\n3：1080P（2：720p；3：1080p）",
+                                        "example"    : 2,
+                                        "default"    : 2,
+                                        "enum"       : [2, 3]
+                                    },
+                                    "images"           : {
+                                        "type"       : "array",
+                                        "description": "参考图片（最多上传7张）",
+                                        "items"      : {"type": "string"},
+                                        "example"    : []
+                                    }
+                                },
+                                "required"  : ["prompt", "aspect_ratio", "duration", "resolution_option"]
+                            }
+                        }
+                    }
+                },
+                "responses"  : {
+                    "200": {
+                        "description": "成功",
+                        "content"    : {
+                            "application/json": {
+                                "schema" : {"$ref": "#/components/schemas/VideoTaskResponse"},
+                                "example": {
+                                    "status" : 100,
+                                    "message": "操作成功",
+                                    "data"   : {"id": 11, "status": "Running", "amount": 100}
+                                }
+                            }
+                        }
+                    }
+                },
+                "operationId": "createOmniVideo"
+            }
+        },
+        "/volcano/delAsset": {
+            "post": {
+                "summary"    : "删除素材",
+                "description": "",
+                "x-mint"     : { "href": "/openapi-ref/volcano/del-asset", "metadata": {"sidebarTitle": "删除素材"} },
+                "tags"       : ["Seedance 官方-删除素材"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type"      : "object",
+                                "properties": { "id": {"type": "integer", "description": "素材 ID", "example": 1} },
+                                "required"  : ["id"]
+                            }
+                        }
+                    }
+                },
+                "responses"  : {
+                    "200": {
+                        "description": "成功",
+                        "content"    : {
+                            "application/json": {
+                                "schema" : {
+                                    "type"      : "object",
+                                    "properties": {
+                                        "status" : {"type": "integer", "description": "状态码",       "example": 100   },
+                                        "message": {"type": "string",  "description": "响应消息",      "example": "操作成功"},
+                                        "data"   : {"type": "integer", "description": "被删除的素材 ID", "example": 1     }
+                                    },
+                                    "required"  : ["status", "message", "data"]
+                                },
+                                "example": {"status": 100, "message": "操作成功", "data": 1}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/volcano/editAsset": {
+            "post": {
+                "summary"    : "更新素材名",
+                "description": "",
+                "x-mint"     : { "href": "/openapi-ref/volcano/edit-asset", "metadata": {"sidebarTitle": "更新素材名"} },
+                "tags"       : ["Seedance 官方-更新素材名"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type"      : "object",
+                                "properties": {
+                                    "id"       : {"type": "integer", "description": "素材 ID", "example": 1},
+                                    "file_name": {"type": "string", "description": "文件名", "example": "sample-image.jpg"}
+                                },
+                                "required"  : ["id", "file_name"]
+                            }
+                        }
+                    }
+                },
+                "responses"  : {
+                    "200": {
+                        "description": "成功",
+                        "content"    : {
+                            "application/json": {
+                                "schema" : {
+                                    "type"      : "object",
+                                    "properties": {
+                                        "status" : {"type": "integer", "description": "状态码",       "example": 100   },
+                                        "message": {"type": "string",  "description": "响应消息",      "example": "操作成功"},
+                                        "data"   : {"type": "integer", "description": "被更新的素材 ID", "example": 1     }
+                                    },
+                                    "required"  : ["status", "message", "data"]
+                                },
+                                "example": {"status": 100, "message": "操作成功", "data": 1}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/volcano/getAssetStatus": {
+            "post": {
+                "summary"    : "获取素材审核结果",
+                "description": "",
+                "x-mint"     : {
+                    "href"    : "/openapi-ref/volcano/get-asset-status",
+                    "metadata": {"sidebarTitle": "获取素材审核结果"}
+                },
+                "tags"       : ["Seedance 官方-获取素材审核结果"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type"      : "object",
+                                "properties": { "id": {"type": "integer", "description": "素材 ID", "example": 1} },
+                                "required"  : ["id"]
+                            }
+                        }
+                    }
+                },
+                "responses"  : {
+                    "200": {
+                        "description": "成功",
+                        "content"    : {
+                            "application/json": {
+                                "schema" : {
+                                    "type"      : "object",
+                                    "properties": {
+                                        "status" : {"type": "integer", "description": "状态码", "example": 100},
+                                        "message": {"type": "string", "description": "响应消息", "example": "操作成功"},
+                                        "data"   : {
+                                            "type"       : "object",
+                                            "description": "素材审核信息",
+                                            "properties" : {
+                                                "id"       : {"type": "integer", "description": "ID", "example": 1},
+                                                "status"   : {
+                                                    "type"       : "integer",
+                                                    "description": "状态（1 审核中，2 审核通过，3 审核失败）",
+                                                    "enum"       : [1, 2, 3],
+                                                    "example"    : 1
+                                                },
+                                                "file_name": {
+                                                    "type"       : "string",
+                                                    "description": "文件名",
+                                                    "example"    : "sample-image.jpg"
+                                                },
+                                                "message"  : {
+                                                    "type"       : "string",
+                                                    "description": "审核不通过的信息",
+                                                    "example"    : null
+                                                }
+                                            },
+                                            "required"   : ["id", "status", "file_name", "message"]
+                                        }
+                                    },
+                                    "required"  : ["status", "message", "data"]
+                                },
+                                "example": {
+                                    "status" : 100,
+                                    "message": "操作成功",
+                                    "data"   : {"id": 1, "status": 1, "file_name": "sample-image.jpg", "message": null}
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/volcano/getUserAssetList": {
+            "post": {
+                "summary"    : "素材管理列表",
+                "description": "",
+                "x-mint"     : {
+                    "href"    : "/openapi-ref/volcano/get-user-asset-list",
+                    "metadata": {"sidebarTitle": "素材列表"}
+                },
+                "tags"       : ["Seedance 官方-素材列表"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type"      : "object",
+                                "properties": {
+                                    "page"     : {"type": "integer", "description": "页码", "example": 1},
+                                    "size"     : {"type": "integer", "description": "每页大小", "example": 10},
+                                    "status"   : {
+                                        "type"       : "number",
+                                        "description": "状态（1 审核中，2 审核通过，3 审核失败）",
+                                        "enum"       : [1, 2, 3]
+                                    },
+                                    "keywords" : {"type": "string", "description": "关键词", "example": ""},
+                                    "file_type": {
+                                        "type"       : "string",
+                                        "description": "素材类型（image 图片，video 视频，audio 音频）",
+                                        "enum"       : ["image", "video", "audio"]
+                                    }
+                                },
+                                "required"  : ["page", "size"]
+                            }
+                        }
+                    }
+                },
+                "responses"  : {
+                    "200": {
+                        "description": "成功",
+                        "content"    : {
+                            "application/json": {
+                                "schema" : {
+                                    "type"      : "object",
+                                    "properties": {
+                                        "status" : {"type": "number", "description": "状态码", "example": 100},
+                                        "message": {"type": "string", "description": "响应消息", "example": "操作成功"},
+                                        "data"   : {
+                                            "type"       : "object",
+                                            "description": "素材列表数据",
+                                            "properties" : {
+                                                "count": {"type": "number", "description": "素材总数", "example": 1},
+                                                "list" : {
+                                                    "type"       : "array",
+                                                    "description": "素材列表",
+                                                    "items"      : {
+                                                        "type"      : "object",
+                                                        "properties": {
+                                                            "id"        : {
+                                                                "type"       : "number",
+                                                                "description": "ID",
+                                                                "example"    : 1
+                                                            },
+                                                            "user_id"   : {
+                                                                "type"       : "number",
+                                                                "description": "用户ID",
+                                                                "example"    : 10
+                                                            },
+                                                            "website_id": {
+                                                                "type"       : "number",
+                                                                "description": "站点ID",
+                                                                "example"    : 10
+                                                            },
+                                                            "file_name" : {
+                                                                "type"       : "string",
+                                                                "description": "文件名",
+                                                                "example"    : "r2v_tea_pic1.jpg"
+                                                            },
+                                                            "file_url"  : {
+                                                                "type"       : "string",
+                                                                "description": "文件链接",
+                                                                "example"    : ""
+                                                            },
+                                                            "assetType" : {
+                                                                "type"       : "string",
+                                                                "description": "文件类型",
+                                                                "example"    : "jpg"
+                                                            },
+                                                            "file_id"   : {
+                                                                "type"       : "string",
+                                                                "description": "对应火山上的文件ID",
+                                                                "example"    : "asset-20260826-example"
+                                                            },
+                                                            "status"    : {
+                                                                "type"       : "number",
+                                                                "description": "状态（1 审核中，2 审核通过，3 审核失败）",
+                                                                "enum"       : [1, 2, 3],
+                                                                "example"    : 1
+                                                            },
+                                                            "message"   : {
+                                                                "type"       : "null",
+                                                                "description": "错误信息",
+                                                                "example"    : null
+                                                            },
+                                                            "error_code": {
+                                                                "type"       : "null",
+                                                                "description": "错误代码",
+                                                                "example"    : null
+                                                            }
+                                                        },
+                                                        "required"  : [
+                                                            "id",         "user_id",    "website_id", "file_name",
+                                                            "file_url",   "assetType",  "file_id",    "status",
+                                                            "message",    "error_code"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required"   : ["count", "list"]
+                                        }
+                                    },
+                                    "required"  : ["status", "message", "data"]
+                                },
+                                "example": {
+                                    "status" : 100,
+                                    "message": "操作成功",
+                                    "data"   : {
+                                        "count": 1,
+                                        "list" : [
+                                            {
+                                                "id"        : 1,
+                                                "user_id"   : 10,
+                                                "website_id": 10,
+                                                "file_name" : "sample-image.jpg",
+                                                "file_url"  : "https://example.com/assets/sample-image.jpg",
+                                                "assetType" : "jpg",
+                                                "file_id"   : "asset-20260826-example",
+                                                "status"    : 1,
+                                                "message"   : null,
+                                                "error_code": null
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/volcano/uploadAsset": {
+            "post": {
+                "summary"    : "上传素材",
+                "description": "",
+                "x-mint"     : { "href": "/openapi-ref/volcano/upload-asset", "metadata": {"sidebarTitle": "上传素材"} },
+                "tags"       : ["Seedance 官方-上传素材"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type"      : "object",
+                                "properties": {
+                                    "file_name": {
+                                        "type"       : "string",
+                                        "description": "文件名",
+                                        "example"    : "r2v_tea_pic1.jpg"
+                                    },
+                                    "file_url" : {"type": "string", "description": "文件链接", "example": ""}
+                                },
+                                "required"  : ["file_name", "file_url"]
+                            }
+                        }
+                    }
+                },
+                "responses"  : {
+                    "200": {
+                        "description": "成功",
+                        "content"    : {
+                            "application/json": {
+                                "schema" : {
+                                    "type"      : "object",
+                                    "properties": {
+                                        "status" : {"type": "number", "description": "状态码",       "example": 100   },
+                                        "message": {"type": "string", "description": "响应消息",      "example": "操作成功"},
+                                        "data"   : {"type": "number", "description": "上传后的素材 ID", "example": 102   }
+                                    },
+                                    "required"  : ["status", "message", "data"]
+                                },
+                                "example": {"status": 100, "message": "操作成功", "data": 102}
+                            }
+                        }
+                    }
+                }
+            }
         }
-      }
     },
-    "/volcano/uploadAsset": {
-      "post": {
-        "summary": "上传素材",
-        "description": "",
-        "x-mint": {
-          "href": "/openapi-ref/volcano/upload-asset",
-          "metadata": {
-            "sidebarTitle": "上传素材"
-          }
-        },
-        "tags": ["Seedance 官方-上传素材"],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "file_name": {
-                    "type": "string",
-                    "description": "文件名",
-                    "example": "r2v_tea_pic1.jpg"
-                  },
-                  "file_url": {
-                    "type": "string",
-                    "description": "文件链接",
-                    "example": ""
-                  }
-                },
-                "required": ["file_name", "file_url"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "number",
-                      "description": "状态码",
-                      "example": 100
-                    },
-                    "message": {
-                      "type": "string",
-                      "description": "响应消息",
-                      "example": "操作成功"
-                    },
-                    "data": {
-                      "type": "number",
-                      "description": "上传后的素材 ID",
-                      "example": 102
-                    }
-                  },
-                  "required": ["status", "message", "data"]
-                },
-                "example": {
-                  "status": 100,
-                  "message": "操作成功",
-                  "data": 102
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  },
-  "servers": [
-    {
-      "url": "https://open251124.ai.jko.cc"
-    }
-  ],
-  "security": [
-    {
-      "BearerAuth": []
-    }
-  ]
+    "servers"   : [ {"url": "https://open251124.ai.jko.cc"} ],
+    "security"  : [ {"BearerAuth": []} ]
 }
